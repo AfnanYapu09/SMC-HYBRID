@@ -1,83 +1,44 @@
-
-//@version=5
+/@version=5
 indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
-
-//Input
-    //Pivot Period of Order Blocks Detector
 PP = input.int(5, 'Pivot Period of Order Blocks Detector' , group = 'Logic Parameter' , minval = 1)
-
-    //Lines
-        // Zig Zag
-ShZ = input.bool(true , 'Show Zig Zag Line', group = 'Zig Zag Line') //Show Zig Zag
-ZLS = input.string(line.style_solid , 'Zig Zag Line Style' , options = [line.style_solid ,line.style_dotted , line.style_dashed], group = 'Zig Zag Line' ) //Zig Zag Line Style
-ZLC = input.color(color.rgb(0, 0, 0, 46) , 'Zig Zag Line Color' , group = 'Zig Zag Line')  //Zig Zag Line Color
-ZLW = input.int(1 ,'Zig Zag Line Width' , group = 'Zig Zag Line')//Zig Zag Line Width 
-    //Label
-ShL = input.bool(false , 'Show Label', group = 'Zig Zag Label') //Show Label 
-LC =  input.color(color.rgb(0, 0, 0) , 'Label Color' , group = 'Zig Zag Label')//Label Color       
-        //Bos Lines
-            //Major Line
-                //Bullish
+ShZ = input.bool(true , 'Show Zig Zag Line', group = 'Zig Zag Line') 
+ZLS = input.string(line.style_solid , 'Zig Zag Line Style' , options = [line.style_solid ,line.style_dotted , line.style_dashed], group = 'Zig Zag Line' ) 
+ZLC = input.color(color.rgb(0, 0, 0, 46) , 'Zig Zag Line Color' , group = 'Zig Zag Line')  
+ZLW = input.int(1 ,'Zig Zag Line Width' , group = 'Zig Zag Line')
+ShL = input.bool(false , 'Show Label', group = 'Zig Zag Label') 
+LC =  input.color(color.rgb(0, 0, 0) , 'Label Color' , group = 'Zig Zag Label')
 MajorBuBoSLine_Show       = input.string('On'  ,'Show Major Bullish BoS Lines', ['On', 'Off'] , group = 'Major Bullish "BoS" Lines')
 MajorBuBoSLine_Style    = input.string(line.style_solid ,'Style Major Bullish BoS Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bullish "BoS" Lines')
 MajorBuBoSLine_Color    = input.color(#000000 ,'Color Major Bullish BoS Lines'  , group = 'Major Bullish "BoS" Lines')
-
-
-                //Bearish
 MajorBeBoSLine_Show       = input.string('On'  ,'Show Major Bearish BoS Lines', ['On', 'Off'] , group = 'Major Bearish "BoS" Lines')
 MajorBeBoSLine_Style    = input.string(line.style_solid ,'Style Major Bearish BoS Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bearish "BoS" Lines')
 MajorBeBoSLine_Color    = input.color(#030303 ,'Color Major Bearish BoS Lines'  , group = 'Major Bearish "BoS" Lines')
-
-
-            //Minor
-                //Bullish
 MinorBuBoSLine_Show       = input.string('Off'  ,'Show Minor Bullish BoS  Lines', ['On', 'Off'] , group = 'Minor Bullish "BoS"  Lines')
 MinorBuBoSLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish BoS  Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Minor Bullish "BoS"  Lines')
 MinorBuBoSLine_Color    = input.color(color.black ,'Color Minor Bullish BoS  Lines' , group = 'Minor Bullish "BoS"  Lines' )
-
-
-                //Bearish
 MinorBeBoSLine_Show       = input.string('Off'  ,'Show Minor Bearish BoS Lines', ['On', 'Off'] , group = 'Minor Bearish "BoS" Lines' )
 MinorBeBoSLine_Style    = input.string(line.style_dashed ,'Style inor Bearish BoS Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Minor Bearish "BoS" Lines')
 MinorBeBoSLine_Color    = input.color(color.black ,'Color inor Bearish BoS Lines' , group = 'Minor Bearish "BoS" Lines')
-
-        //ChoCh Lines
-            //Major Line
-                //Bullish
 MajorBuChoChLine_Show     = input.string('On'  ,'Show Major Bullish ChoCh Lines', ['On', 'Off'] , group = 'Major Bullish "ChoCh" Lines')
 MajorBuChoChLine_Style    = input.string(line.style_solid ,'Style Major Bullish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Major Bullish "ChoCh" Lines')
 MajorBuChoChLine_Color    = input.color(#ff0000 ,'Color Major Bullish ChoCh Lines' , group = 'Major Bullish "ChoCh" Lines')
-
-                //Bearish
 MajorBeChoChLine_Show     = input.string('On'  ,'Show Major Bearish ChoCh Lines', ['On', 'Off'] , group = 'Major Bearish "ChoCh" Lines')
 MajorBeChoChLine_Style    = input.string(line.style_solid ,'Style Major Bearish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bearish "ChoCh" Lines')
 MajorBeChoChLine_Color    = input.color(#ff0000 ,'Color Major Bearish ChoCh Lines'  , group = 'Major Bearish "ChoCh" Lines')
-
-            //Minor
-                //Bullish
 MinorBuChoChLine_Show     = input.string('Off'  ,'Show Minor Bullish ChoCh Lines', ['On', 'Off'] , group = 'Minor Bullish "ChoCh" Lines')
 MinorBuChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Minor Bullish "ChoCh" Lines')
 MinorBuChoChLine_Color    = input.color(color.black ,'Color Minor Bullish ChoCh Lines' , group = 'Minor Bullish "ChoCh" Lines')
-
-                //Bearish           
 MinorBeChoChLine_Show     = input.string('Off'  ,'Show Minor Bearish ChoCh Lines', ['On', 'Off'] , group = 'Minor Bearish "ChoCh" Lines')
 MinorBeChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bearish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Minor Bearish "ChoCh" Lines')
 MinorBeChoChLine_Color    = input.color(color.black ,'Color Minor Bearish ChoCh Lines'  , group = 'Minor Bearish "ChoCh" Lines')
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-//Variables
-
-    //ZigZag Data
 Open = open
 High = high
 Low = low
@@ -103,176 +64,103 @@ HighIndex = ta.valuewhen(HighPivot ,Bar_Index[PP], 0)
 LowIndex = ta.valuewhen(LowPivot ,Bar_Index[PP], 0)
 Correct_HighPivot = 0.0
 Correct_LowPivot =  0.0
-
-    //Major Levels
 var float Major_HighLevel = na
 var float Major_LowLevel  = na
-
 var int Major_HighIndex = na
 var int Major_LowIndex = na
-
 var string Major_HighType= na
 var string Major_LowType = na
-
-    //Minor Levels
 var float Minor_HighLevel = na
 var float Minor_LowLevel  = na
-
 var int Minor_HighIndex   = na
 var int Minor_LowIndex    = na
-
 var string Minor_HighType = na
 var string Minor_LowType  = na
-
 var int LockDetecteM_MinorLvL = 0
-
-    //
 var bool Lock0 = true
 var bool Lock1 = true
-
-// Detecte Major & Minor Pivot
-// Order Blocks Data
-    //Major
 var int LastMHH = 0
 var int Last02MHH = 0
 var int LastMLH = 0
-
 var int LastMLL = 0
 var int Last02MLL = 0
 var int LastMHL = 0
-    //Minor
 var int LastmHH = 0
 var int Last02mHH = 0
 var int LastmLH = 0
-
 var int LastmLL = 0
 var int Last02mLL = 0
 var int LastmHL = 0
-
-/////////////////////////////
-// Last Pivot First Point////
-/////////////////////////////
 var string LastPivotType = na
 var int LastPivotIndex = 0
-
 var string LastPivotType02 = na
 var int LastPivotIndex02 = 0
-
-    //Major 01
 var float MajorHighValue01 = na
 var int   MajorHighIndex01 = na
 var string MajorHighType01 = ''
-
 var float MajorLowValue01  = na
 var int   MajorLowIndex01 =  na
 var string MajorLowType01 =  ''
-
-    //Minor 01
 var float MinorHighValue01 = na
 var int   MinorHighIndex01 = na
 var string MinorHighType01 = ''
-
 var float MinorLowValue01  = na
 var int   MinorLowIndex01  = na
 var string MinorLowType01 =  ''
-
-/////////////////////////////////////
-//One to the Last Pivot First Point//
-/////////////////////////////////////
-    //Major 02
 var float MajorHighValue02 = na
 var int   MajorHighIndex02 = na
 var string MajorHighType02 = ''
-
 var float MajorLowValue02  = na
 var int   MajorLowIndex02 =  na
 var string MajorLowType02 =  ''
-
-    //Minor 02
 var float MinorHighValue02 = na
 var int   MinorHighIndex02 = na
 var string MinorHighType02 = ''
-
 var float MinorLowValue02  = na
 var int   MinorLowIndex02  = na
 var string MinorLowType02 =  ''
-
-    //Major 02 Change Type Pivot
 var float MajorHighValue02Ch = na
 var int   MajorHighIndex02Ch = na
 var string MajorHighType02Ch = ''
-
 var float MajorLowValue02Ch  = na
 var int   MajorLowIndex02Ch =  na
 var string MajorLowType02Ch =  ''
-
-    //Lines Data
 var line MajorLine_ChoChBull   = na
 var label MajorLabel_ChoChBull = na
-
 var line MajorLine_ChoChBear   = na
 var label MajorLabel_ChoChBear = na
-
 var line MajorLine_BoSBull     = na
 var label MajorLabel_BoSBull   = na
-
 var line MajorLine_BoSBear     = na
 var label MajorLabel_BoSBear   = na
-
 var line MinorLine_ChoChBull   = na
 var label MinorLabel_ChoChBull = na
-
 var line MinorLine_ChoChBear   = na
 var label MinorLabel_ChoChBear = na
-
 var line MinorLine_BoSBull     = na
 var label MinorLabel_BoSBull   = na
-
 var line MinorLine_BoSBear     = na
 var label MinorLabel_BoSBear   = na
-
-    // BoS & ChoCh Data
-        //Major
 var bool Bullish_Major_ChoCh = false
 var bool Bullish_Major_BoS = false
-
 var bool Bearish_Major_ChoCh = false
 var bool Bearish_Major_BoS = false
-
 var BoS_MajorType  = array.new_string()
 var BoS_MajorIndex = array.new_int()
-
 var ChoCh_MajorType  = array.new_string()
 var ChoCh_MajorIndex = array.new_int()
-
 var int LockBreak_M = 0 
-
-        //Minor
 var bool Bullish_Minor_ChoCh = false
 var bool Bullish_Minor_BoS = false
-
 var bool Bearish_Minor_ChoCh = false
 var bool Bearish_Minor_BoS = false
-
 var BoS_MinorType  = array.new_string()
 var BoS_MinorIndex = array.new_int()
-
 var ChoCh_MinorType  = array.new_string()
 var ChoCh_MinorIndex = array.new_int()
-
 var int LockBreak_m = 0 
-
-    //Trend Data
-
 var string ExternalTrend = 'No Trend'
 var string InternalTrend = 'No Trend'
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////Calculation/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    //{Zig Zag}
 if HighPivot  and  LowPivot
     if ArrayType.size() == 0
         PASS := 1
@@ -283,12 +171,12 @@ if HighPivot  and  LowPivot
                 array.remove(ArrayType,ArrayType.size() - 1)
                 array.remove(ArrayValue,ArrayValue.size() - 1)
                 array.remove(ArrayIndex,ArrayIndex.size() - 1) 
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                 array.push(ArrayValue, LowValue)
                 array.push(ArrayIndex, LowIndex)
                 Correct_LowPivot :=  LowValue
             else 
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H" ) ///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H" ) 
                 array.push(ArrayValue, HighValue)
                 array.push(ArrayIndex, HighIndex)
             Correct_HighPivot := HighValue  
@@ -298,18 +186,18 @@ if HighPivot  and  LowPivot
                 array.remove(ArrayType,ArrayType.size() - 1)
                 array.remove(ArrayValue,ArrayValue.size() - 1)
                 array.remove(ArrayIndex,ArrayIndex.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")
                 array.push(ArrayValue, HighValue)
                 array.push(ArrayIndex, HighIndex)
                 Correct_HighPivot := HighValue  
             else 
-                array.push(ArrayType,ArrayType.size()>2?  ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2?  ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                 array.push(ArrayValue, LowValue)
                 array.push(ArrayIndex, LowIndex)
             Correct_LowPivot :=  LowValue    
         else if (ArrayType.get(ArrayType.size() - 1)) == "LH"
             if HighPivot < ArrayValue.get(ArrayType.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2?  ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2?  ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                 array.push(ArrayValue, LowValue)
                 array.push(ArrayIndex, LowIndex)
                 Correct_LowPivot :=  LowValue 
@@ -318,18 +206,18 @@ if HighPivot  and  LowPivot
                     array.remove(ArrayType,ArrayType.size() - 1)
                     array.remove(ArrayValue,ArrayValue.size() - 1)
                     array.remove(ArrayIndex,ArrayIndex.size() - 1)
-                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")///////////////////////////////Here
+                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")
                     array.push(ArrayValue, HighValue)
                     array.push(ArrayIndex, HighIndex)
                     Correct_HighPivot := HighValue  
                 else if close > ArrayValue.get(ArrayType.size() - 1)
-                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                     array.push(ArrayValue, LowValue)
                     array.push(ArrayIndex, LowIndex)
                     Correct_LowPivot :=  LowValue
         else if (ArrayType.get(ArrayType.size() - 1)) == "HL"
             if LowPivot > ArrayValue.get(ArrayType.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H" ) ///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H" ) 
                 array.push(ArrayValue, HighValue)
                 array.push(ArrayIndex, HighIndex)
                 Correct_HighPivot := HighValue                       
@@ -338,12 +226,12 @@ if HighPivot  and  LowPivot
                     array.remove(ArrayType,ArrayType.size() - 1)
                     array.remove(ArrayValue,ArrayValue.size() - 1)
                     array.remove(ArrayIndex,ArrayIndex.size() - 1) 
-                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                     array.push(ArrayValue, LowValue)
                     array.push(ArrayIndex, LowIndex)
                     Correct_LowPivot :=  LowValue
                 else if close < ArrayValue.get(ArrayType.size() - 1)
-                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")///////////////////////////////Here
+                    array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")
                     array.push(ArrayValue, HighValue)
                     array.push(ArrayIndex, HighIndex)
                     Correct_HighPivot := HighValue                         
@@ -358,7 +246,7 @@ else if  HighPivot
              (ArrayType.get(ArrayType.size() - 1)) == "HL" or
              (ArrayType.get(ArrayType.size() - 1)) == "LL")
             if HighPivot > ArrayValue.get(ArrayType.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H" ) ///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H" ) 
                 array.push(ArrayValue, HighValue)
                 array.push(ArrayIndex, HighIndex)
                 Correct_HighPivot := HighValue
@@ -366,7 +254,7 @@ else if  HighPivot
                 array.remove(ArrayType,ArrayType.size() - 1)
                 array.remove(ArrayValue,ArrayValue.size() - 1)
                 array.remove(ArrayIndex,ArrayIndex.size() - 1) 
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                 array.push(ArrayValue, LowValue)
                 array.push(ArrayIndex, LowIndex)
                 Correct_LowPivot :=  LowValue                         
@@ -377,7 +265,7 @@ else if  HighPivot
                 array.remove(ArrayType,ArrayType.size() - 1)
                 array.remove(ArrayValue,ArrayValue.size() - 1)
                 array.remove(ArrayIndex,ArrayIndex.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")
                 array.push(ArrayValue, HighValue)
                 array.push(ArrayIndex, HighIndex)
                 Correct_HighPivot := HighValue               
@@ -392,7 +280,7 @@ else if LowPivot
              (ArrayType.get(ArrayType.size() - 1)) == "HH" or 
              (ArrayType.get(ArrayType.size() - 1)) == "LH"
             if LowPivot < ArrayValue.get(ArrayType.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2?  ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2?  ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                 array.push(ArrayValue, LowValue)
                 array.push(ArrayIndex, LowIndex)
                 Correct_LowPivot :=  LowValue
@@ -400,7 +288,7 @@ else if LowPivot
                 array.remove(ArrayType,ArrayType.size() - 1)
                 array.remove(ArrayValue,ArrayValue.size() - 1)
                 array.remove(ArrayIndex,ArrayIndex.size() - 1)
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H")
                 array.push(ArrayValue, HighValue)
                 array.push(ArrayIndex, HighIndex)
                 Correct_HighPivot := HighValue                        
@@ -411,14 +299,10 @@ else if LowPivot
                 array.remove(ArrayType,ArrayType.size() - 1)
                 array.remove(ArrayValue,ArrayValue.size() - 1)
                 array.remove(ArrayIndex,ArrayIndex.size() - 1) 
-                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")///////////////////////////////Here
+                array.push(ArrayType,ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L")
                 array.push(ArrayValue, LowValue)
                 array.push(ArrayIndex, LowIndex)
                 Correct_LowPivot :=  LowValue
-
-    //{Zig Zag Advance}
-
-        //first Major & Minor Detector
 if ArrayType.size() ==  2
     if ArrayType.get(0) == 'H'
         Major_HighLevel := ArrayValue.get(0)
@@ -434,24 +318,18 @@ if ArrayType.size() ==  2
         Major_LowIndex  := ArrayIndex.get(0)
         Major_HighType := ArrayType.get(1)
         Major_LowType  := ArrayType.get(0)
-
-        //Making Copies of Arrays
-
-
 if  ArrayValue.size() == 1
     if Lock0
         array.insert(ArrayTypeAdv ,0 ,'M' +  ArrayType.get(0))
         array.insert(ArrayValueAdv,0 ,ArrayValue.get(0))
         array.insert(ArrayIndexAdv,0 ,ArrayIndex.get(0))   
         Lock0 := false
-
 if  ArrayValue.size() == 2
     if Lock1
         array.insert(ArrayTypeAdv ,1 ,'M' +  ArrayType.get(1))
         array.insert(ArrayValueAdv,1 ,ArrayValue.get(1))
         array.insert(ArrayIndexAdv,1 ,ArrayIndex.get(1))   
         Lock1 := false
-
 if ArrayValue.size() > 1
     if ArrayValue.get(ArrayValue.size()-1)[1] != ArrayValue.get(ArrayValue.size()-1)
         if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) != 
@@ -465,11 +343,7 @@ if ArrayValue.size() > 1
             array.remove(ArrayIndexAdv, ArrayIndexAdv.size() - 1)
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
             array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
-
-        //All Major & Minor Pivot Detector 
-
 if ArrayValueAdv.size() > 1
-            //High Major Detector
     if close > Major_HighLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
@@ -503,7 +377,6 @@ if ArrayValueAdv.size() > 1
                 Major_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 Major_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 Major_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayValueAdv.get(ArrayValueAdv.size() - 1) > Major_HighLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
@@ -523,8 +396,6 @@ if ArrayValueAdv.size() > 1
             Major_HighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             Major_HighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             Major_HighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-
-            //Low Major Detector
     if close < Major_LowLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
@@ -558,7 +429,6 @@ if ArrayValueAdv.size() > 1
                 Major_HighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 Major_HighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 Major_HighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if ArrayValueAdv.get(ArrayValueAdv.size() - 1) < Major_LowLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
@@ -566,7 +436,6 @@ if ArrayValueAdv.size() > 1
             Major_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             Major_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             Major_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1) ) 
@@ -579,14 +448,12 @@ if ArrayValueAdv.size() > 1
             Major_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             Major_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             Major_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-
 if ArrayTypeAdv.size() >= 2
     X1 = ArrayIndexAdv.get(ArrayIndexAdv.size()-2)
     Y1 = ArrayValueAdv.get(ArrayIndexAdv.size()-2)
     X2 = ArrayIndexAdv.get(ArrayIndexAdv.size()-1)
     Y2 = ArrayValueAdv.get(ArrayIndexAdv.size()-1)
     T1 = ArrayTypeAdv.get(ArrayIndexAdv.size()-1)
-
     ZZLine := line.new( X1 , Y1 , X2 , Y2 ,color =ShZ ? ZLC : #ffffff00, style = ZLS , width = ZLW )
     if ShL == true
         Label := label.new(x = X2 , y = Y2 , text = T1, color = color.rgb(255, 255, 255, 100) , 
@@ -597,26 +464,16 @@ if ArrayTypeAdv.size() >= 2
         line.delete(ZZLine[1])
     if Label.get_text()[1] != Label.get_text()[1]
         Label.set_text('0')
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    //Get Pivot Data
-        //Last Pivot Data
 if ArrayTypeAdv.size() > 1
     LastPivotType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
     LastPivotIndex := ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
     LastPivotType02 := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
     LastPivotIndex02 := ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        //Major
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'MHH'
         MajorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
         MajorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
         MajorHighType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         LastMHH            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'MLH'
         MajorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
         MajorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
@@ -632,8 +489,6 @@ if ArrayTypeAdv.size() > 1
         MajorLowIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
         MajorLowType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         LastMHL            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    
-        //Minor
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'mHH'
         MinorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
         MinorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
@@ -654,77 +509,56 @@ if ArrayTypeAdv.size() > 1
         MinorLowIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
         MinorLowType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         LastmHL           :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-
-    //One to the Last Pivot Data
 if ArrayTypeAdv.size() > 1
-        //Major
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHH'
         MajorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MajorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MajorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLH'
         MajorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MajorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MajorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLL'
         MajorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MajorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MajorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHL'
         MajorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MajorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MajorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
-    
-        //Minor
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mHH'
         MinorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MinorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MinorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mLH'
         MinorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MinorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MinorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mLL'
         MinorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MinorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MinorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
     if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mHL'
         MinorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
         MinorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
         MinorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
-        // Change Pivot Type to Major
-    if ArrayTypeAdv.get(ArrayTypeAdv.size()-2) != ArrayTypeAdv.get(ArrayTypeAdv.size()-2)[1] // Change Pivot Type to Major
-        //Major
+    if ArrayTypeAdv.get(ArrayTypeAdv.size()-2) != ArrayTypeAdv.get(ArrayTypeAdv.size()-2)[1] 
         if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHH'
             MajorHighValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
             MajorHighIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
             MajorHighType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
         if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLH'
             MajorHighValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
             MajorHighIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
             MajorHighType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
         if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLL'
             MajorLowValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
             MajorLowIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
             MajorLowType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
         if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHL'
             MajorLowValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
             MajorLowIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
             MajorLowType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
-    // Detecte Minor level
-
 if ArrayTypeAdv.size() > 2  
     LockDetecteM_MinorLvL := 1
     if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'m') == 0 and
@@ -745,9 +579,7 @@ if ArrayTypeAdv.size() > 2
             Minor_HighType  := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
             Minor_LowType   := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
     if LockDetecteM_MinorLvL == 1
-        //High Minor Detector
         if close > Minor_HighLevel
-
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'     
                 Minor_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 Minor_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -765,10 +597,7 @@ if ArrayTypeAdv.size() > 2
                     Minor_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                     Minor_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                     Minor_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-                    
-
         if  ArrayValueAdv.get(ArrayValueAdv.size() - 1) > Minor_HighLevel
-
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH' 
                 Minor_HighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 Minor_HighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -783,10 +612,7 @@ if ArrayTypeAdv.size() > 2
                 Minor_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 Minor_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 Minor_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
-        //Low Minor Detector
         if close < Minor_LowLevel
-
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'     
                 Minor_HighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 Minor_HighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -804,7 +630,6 @@ if ArrayTypeAdv.size() > 2
                     Minor_HighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                     Minor_HighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                     Minor_HighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
         if ArrayValueAdv.get(ArrayValueAdv.size() - 1) < Minor_LowLevel
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL' 
                 Minor_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
@@ -820,8 +645,6 @@ if ArrayTypeAdv.size() > 2
                 Minor_HighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 Minor_HighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 Minor_HighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-
-    //Reset Minor Levels
     if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'M') == 0
         LockDetecteM_MinorLvL := 0
         Minor_HighLevel := na
@@ -831,13 +654,7 @@ if ArrayTypeAdv.size() > 2
         Minor_HighType  := na
         Minor_LowType   := na
         InternalTrend   := 'No Trend'
-
-
-    //ChoCh and BoS Detector
-        //Bos and ChoCh Line
-            //Major
-
-if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex // Bullish BoS Detector
+if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex 
     if (ExternalTrend == 'No Trend' or ExternalTrend == 'Up Trend')
         Bullish_Major_BoS := true
         BoS_MajorType.push('Bull Major BoS')
@@ -848,7 +665,7 @@ if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex //
             MajorLine_BoSBull     := line.new(Major_HighIndex, Major_HighLevel , bar_index , Major_HighLevel , style = MajorBuBoSLine_Style , color = MajorBuBoSLine_Color)
             MajorLabel_BoSBull    := label.new((Major_HighIndex + bar_index) / 2 , Major_HighLevel   , 
              text = 'Major BoS' , color = color.rgb(0,0,0,100), textcolor = MajorBuBoSLine_Color ,size = size.normal )
-    else if ExternalTrend == 'Down Trend' // Bullish ChoCh Detector
+    else if ExternalTrend == 'Down Trend' 
         Bullish_Major_ChoCh := true
         ChoCh_MajorType.push('Bull Major ChoCh')
         ChoCh_MajorIndex.push(bar_index)
@@ -861,9 +678,7 @@ if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex //
 else
     Bullish_Major_ChoCh := false
     Bullish_Major_BoS   := false 
-
-
-if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex // Bearish BoS Detector
+if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex 
     if ExternalTrend == 'No Trend' or ExternalTrend == 'Down Trend'
         Bearish_Major_BoS := true
         BoS_MajorType.push('Bear Major BoS')
@@ -875,7 +690,7 @@ if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex // Be
             MajorLabel_BoSBear    := label.new((Major_LowIndex + bar_index) / 2 , Major_LowLevel   , 
              text = 'Major BoS' , color = color.rgb(0,0,0,100), 
              textcolor = MajorBeBoSLine_Color , style = label.style_label_up ,size = size.normal)        
-    else if ExternalTrend == 'Up Trend' // Bearish ChoCh Detector
+    else if ExternalTrend == 'Up Trend' 
         Bearish_Major_ChoCh := true
         ChoCh_MajorType.push('Bear Major ChoCh')
         ChoCh_MajorIndex.push(bar_index)
@@ -888,11 +703,7 @@ if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex // Be
 else 
     Bearish_Major_ChoCh := false 
     Bearish_Major_BoS   := false 
-
-
-            //Minor
-
-if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex // Bullish BoS Detector
+if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex 
     if (InternalTrend == 'No Trend' or InternalTrend == 'Up Trend') 
         Bullish_Minor_BoS   := true
         BoS_MinorType.push('Bull Minor BoS')
@@ -902,7 +713,7 @@ if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex // Bullish BoS 
         if MinorBuBoSLine_Show  == 'On' 
             MinorLine_BoSBull     := line.new(Minor_HighIndex, Minor_HighLevel , bar_index , Minor_HighLevel , style = MinorBuBoSLine_Style , color = MinorBuBoSLine_Color)
             MinorLabel_BoSBull    := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = 'Minor BoS' , color = color.rgb(0,0,0,100), textcolor = MinorBuBoSLine_Color ,size = size.small )        
-    else if InternalTrend == 'Down Trend' // Bullish ChoCh Detector
+    else if InternalTrend == 'Down Trend' 
         Bullish_Minor_ChoCh := true
         ChoCh_MinorType.push('Bull Minor ChoCh')
         ChoCh_MinorIndex.push(bar_index)
@@ -914,9 +725,7 @@ if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex // Bullish BoS 
 else 
     Bullish_Minor_ChoCh := false
     Bullish_Minor_BoS   := false
-
-
-if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex // Bearish BoS Detector
+if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex 
     if InternalTrend == 'No Trend' or InternalTrend == 'Down Trend'
         Bearish_Minor_BoS   := true
         BoS_MinorType.push('Bear Minor BoS')
@@ -927,7 +736,7 @@ if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex // Bearish BoS Dete
             MinorLine_BoSBear     := line.new(Minor_LowIndex, Minor_LowLevel , bar_index , Minor_LowLevel , style = MinorBeBoSLine_Style , color = MinorBeBoSLine_Color)
             MinorLabel_BoSBear    := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = 'Minor BoS' , color = color.rgb(0,0,0,100), 
              textcolor = MinorBeBoSLine_Color , style = label.style_label_up ,size = size.small) 
-    else if InternalTrend == 'Up Trend' // Bearish ChoCh Detector
+    else if InternalTrend == 'Up Trend' 
         Bearish_Minor_ChoCh := true
         ChoCh_MinorType.push('Bear Minor ChoCh')
         ChoCh_MinorIndex.push(bar_index)
@@ -940,10 +749,6 @@ if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex // Bearish BoS Dete
 else
     Bearish_Minor_ChoCh := false
     Bearish_Minor_BoS   := false
-
-
-
-// Imbalance detection
 showImbalance = input.bool(false, 'Show/Color', group="Imbalance", inline="Imbalance")
 colorImbalance = input.color(#f4f004, '', group="Imbalance", inline="Imbalance")
 if showImbalance
@@ -953,8 +758,6 @@ if showImbalance
         box.new(left=bar_index[1], top=low, right=bar_index, bottom=high[2], bgcolor=colorImbalance, border_color=colorImbalance)
     if bearishImb
         box.new(left=bar_index[1], top=high, right=bar_index, bottom=low[2], bgcolor=colorImbalance, border_color=colorImbalance)
-
-// Order block logic
 showOrderblock = input.bool(true, 'Show/Color', group="Orderblock", inline="Orderblock")
 colorOrderblock = input.color(color.rgb(0, 252, 63, 76), '', group="Orderblock", inline="Orderblock")
 if showOrderblock
@@ -974,9 +777,6 @@ if showOrderblock
                 box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[1], bgcolor=colorOrderblock, border_color=colorOrderblock)
             else
                 box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[2], bgcolor=colorOrderblock, border_color=colorOrderblock)  
-
-
-//----------settings----------//
 var g0      = 'Order Block Settings'
 barsReq     = input.int(6, 'Consecutive Bars Required', group = g0, tooltip = 'The number of bars required after the last bullish or bearish bar to validate an order block')
 percGain    = input.float(0.0, 'Percent Gain Required', step = 0.1, group = g0, tooltip = 'The minimum percent gain or loss of the consecutive bars required to validate an order block')
@@ -984,11 +784,8 @@ opposites   = input.bool(false, 'Require Opposite Order Block', group = g0, tool
 mitType     = input.string('Wicks', 'Mitigation Type', ['Wicks', 'Close'])
 irrOb       = input.string('Length', 'Irrelevant Order Block ', ['Length', 'Distance'], group = g0, tooltip = 'Method for considering Order Blocks irrelevant. Either too long (length) or too far away from current price (distance)')
 maxObLen    = input.int(150, 'Max Ob Length or Distance', group = g0, tooltip = 'Maximum bar length or % distance away from Order Block to be considered irrelevant')
-
 var g1      = 'Order Block Display Settings'
 showOb      = input.bool(true, 'Show Order Blocks', group = g1)
 hideOld     = input.bool(false, 'Remove Old or Irrelevant Order Blocks', group = g1)
 bullCol     = input.color(#0033ff26, 'Bullish Color', group = g1)
 bearCol     = input.color(color.new(#ff5252, 85), 'Bearish Color', group = g1)
-//----------fib management----------//
-
