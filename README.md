@@ -54,10 +54,8 @@ var ArrayIndex =  array.new_int()
 var ArrayTypeAdv  = array.new_string()
 var ArrayValueAdv = array.new_float()
 var ArrayIndexAdv =  array.new_int()  
-var line ZZLine = na
 var line Sline = na 
 var line Rline = na 
-var label Label  = na
 PASS = 0
 HighPivot = ta.pivothigh(PP,PP)
 LowPivot = ta.pivotlow(PP,PP)
@@ -452,22 +450,6 @@ if ArrayValueAdv.size() > 1
             Major_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             Major_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             Major_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-if ArrayTypeAdv.size() >= 2
-    X1 = ArrayIndexAdv.get(ArrayIndexAdv.size()-2)
-    Y1 = ArrayValueAdv.get(ArrayIndexAdv.size()-2)
-    X2 = ArrayIndexAdv.get(ArrayIndexAdv.size()-1)
-    Y2 = ArrayValueAdv.get(ArrayIndexAdv.size()-1)
-    T1 = ArrayTypeAdv.get(ArrayIndexAdv.size()-1)
-    ZZLine := line.new( X1 , Y1 , X2 , Y2 ,color =ShZ ? ZLC : #ffffff00, style = ZLS , width = ZLW )
-    if ShL == true
-        Label := label.new(x = X2 , y = Y2 , text = T1, color = color.rgb(255, 255, 255, 100) , 
-             style = T1 == "L" or T1 == "LL" or T1 == "HL" or T1 == "mL" or T1 == "mLL" or T1 == "mHL" or T1 == "ML" or T1 == "MLL" or T1 == "MHL" ? 
-             label.style_label_up : label.style_label_down ,textcolor = LC , size = size.small)                           
-    if line.get_x1(ZZLine) == line.get_x1(ZZLine[1]) 
-        label.delete(Label[1])
-        line.delete(ZZLine[1])
-    if Label.get_text()[1] != Label.get_text()[1]
-        Label.set_text('0')
 if ArrayTypeAdv.size() > 1
     LastPivotType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
     LastPivotIndex := ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
