@@ -1,5 +1,7 @@
 /@version=5
+// === Indicator Setup ===
 indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
+// === Input Parameters ===
 PP = input.int(5, 'Pivot Period of Order Blocks Detector' , group = 'Logic Parameter' , minval = 1)
 ShZ = input.bool(true , 'Show Zig Zag Line', group = 'Zig Zag Line') 
 ZLS = input.string(line.style_solid , 'Zig Zag Line Style' , options = [line.style_solid ,line.style_dotted , line.style_dashed], group = 'Zig Zag Line' ) 
@@ -39,6 +41,7 @@ MinorBeChoChLine_Show     = input.string('Off'  ,'Show Minor Bearish ChoCh Lines
 MinorBeChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bearish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Minor Bearish "ChoCh" Lines')
 MinorBeChoChLine_Color    = input.color(color.black ,'Color Minor Bearish ChoCh Lines'  , group = 'Minor Bearish "ChoCh" Lines')
+// === Variable Initialization ===
 Open = open
 High = high
 Low = low
@@ -161,6 +164,7 @@ var ChoCh_MinorIndex = array.new_int()
 var int LockBreak_m = 0 
 var string ExternalTrend = 'No Trend'
 var string InternalTrend = 'No Trend'
+// === Pivot and Trend Logic ===
 if HighPivot  and  LowPivot
     if ArrayType.size() == 0
         PASS := 1
@@ -749,6 +753,7 @@ if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex
 else
     Bearish_Minor_ChoCh := false
     Bearish_Minor_BoS   := false
+// === Imbalance Visualization ===
 showImbalance = input.bool(false, 'Show/Color', group="Imbalance", inline="Imbalance")
 colorImbalance = input.color(#f4f004, '', group="Imbalance", inline="Imbalance")
 if showImbalance
@@ -758,6 +763,7 @@ if showImbalance
         box.new(left=bar_index[1], top=low, right=bar_index, bottom=high[2], bgcolor=colorImbalance, border_color=colorImbalance)
     if bearishImb
         box.new(left=bar_index[1], top=high, right=bar_index, bottom=low[2], bgcolor=colorImbalance, border_color=colorImbalance)
+// === Order Block Visualization ===
 showOrderblock = input.bool(true, 'Show/Color', group="Orderblock", inline="Orderblock")
 colorOrderblock = input.color(color.rgb(0, 252, 63, 76), '', group="Orderblock", inline="Orderblock")
 if showOrderblock
@@ -777,6 +783,7 @@ if showOrderblock
                 box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[1], bgcolor=colorOrderblock, border_color=colorOrderblock)
             else
                 box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[2], bgcolor=colorOrderblock, border_color=colorOrderblock)  
+// === Order Block Parameters ===
 var g0      = 'Order Block Settings'
 barsReq     = input.int(6, 'Consecutive Bars Required', group = g0, tooltip = 'The number of bars required after the last bullish or bearish bar to validate an order block')
 percGain    = input.float(0.0, 'Percent Gain Required', step = 0.1, group = g0, tooltip = 'The minimum percent gain or loss of the consecutive bars required to validate an order block')
