@@ -41,9 +41,9 @@ MinorBuBoSLine_Color    = input.color(color.black ,'Color Minor Bullish BoS  Lin
 
                 //Bearish
 MinorBeBoSLine_Show       = input.string('Off'  ,'Show Minor Bearish BoS Lines', ['On', 'Off'] , group = 'Minor Bearish "BoS" Lines' )
-MinorBeBoSLine_Style    = input.string(line.style_dashed ,'Style inor Bearish BoS Lines', 
+MinorBeBoSLine_Style    = input.string(line.style_dashed ,'Style Minor Bearish BoS Lines',
  [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Minor Bearish "BoS" Lines')
-MinorBeBoSLine_Color    = input.color(color.black ,'Color inor Bearish BoS Lines' , group = 'Minor Bearish "BoS" Lines')
+MinorBeBoSLine_Color    = input.color(color.black ,'Color Minor Bearish BoS Lines' , group = 'Minor Bearish "BoS" Lines')
 
         //ChoCh Lines
             //Major Line
