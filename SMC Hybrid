@@ -3,12 +3,6 @@
 indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
 // === Input Parameters ===
 PP = input.int(5, 'Pivot Period of Order Blocks Detector' , group = 'Logic Parameter' , minval = 1)
-ShZ = input.bool(true , 'Show Zig Zag Line', group = 'Zig Zag Line') 
-ZLS = input.string(line.style_solid , 'Zig Zag Line Style' , options = [line.style_solid ,line.style_dotted , line.style_dashed], group = 'Zig Zag Line' ) 
-ZLC = input.color(color.rgb(0, 0, 0, 46) , 'Zig Zag Line Color' , group = 'Zig Zag Line')  
-ZLW = input.int(1 ,'Zig Zag Line Width' , group = 'Zig Zag Line')
-ShL = input.bool(false , 'Show Label', group = 'Zig Zag Label') 
-LC =  input.color(color.rgb(0, 0, 0) , 'Label Color' , group = 'Zig Zag Label')
 MajorBuBoSLine_Show       = input.string('On'  ,'Show Major Bullish BoS Lines', ['On', 'Off'] , group = 'Major Bullish "BoS" Lines')
 MajorBuBoSLine_Style    = input.string(line.style_solid ,'Style Major Bullish BoS Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bullish "BoS" Lines')
