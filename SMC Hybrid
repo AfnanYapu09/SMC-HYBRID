@@ -636,7 +636,7 @@ if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex
         if MajorBuBoSLine_Show == 'On'
             MajorLine_BoSBull     := line.new(Major_HighIndex, Major_HighLevel , bar_index , Major_HighLevel , style = MajorBuBoSLine_Style , color = MajorBuBoSLine_Color)
             MajorLabel_BoSBull    := label.new((Major_HighIndex + bar_index) / 2 , Major_HighLevel   ,
-             text = '$$$' , color = color.rgb(0,0,0,100), textcolor = MajorBuBoSLine_Color ,size = size.normal )
+             text = 'Bos' , color = color.rgb(0,0,0,100), textcolor = MajorBuBoSLine_Color ,size = size.normal )
     else if ExternalTrend == 'Down Trend' 
         Bullish_Major_ChoCh := true
         ChoCh_MajorType.push('Bull Major ChoCh')
@@ -660,7 +660,7 @@ if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex
         if MajorBeBoSLine_Show == 'On'
             MajorLine_BoSBear     := line.new(Major_LowIndex, Major_LowLevel , bar_index , Major_LowLevel , style = MajorBeBoSLine_Style , color = MajorBeBoSLine_Color)
             MajorLabel_BoSBear    := label.new((Major_LowIndex + bar_index) / 2 , Major_LowLevel   ,
-             text = '$$$' , color = color.rgb(0,0,0,100),
+             text = 'Bos' , color = color.rgb(0,0,0,100),
              textcolor = MajorBeBoSLine_Color , style = label.style_label_up ,size = size.normal)        
     else if ExternalTrend == 'Up Trend' 
         Bearish_Major_ChoCh := true
@@ -693,7 +693,7 @@ if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex
         InternalTrend := 'Up Trend'
         if MinorBuChoChLine_Show  == 'On'         
             MinorLine_ChoChBull    := line.new(Minor_HighIndex, Minor_HighLevel , bar_index , Minor_HighLevel , style = MinorBuChoChLine_Style , color = MinorBuChoChLine_Color)
-            MinorLabel_ChoChBull   := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = 'choch' , color = color.rgb(0,0,0,100), textcolor = MinorBuChoChLine_Color ,size = size.small )
+            MinorLabel_ChoChBull   := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = '$$$' , color = color.rgb(0,0,0,100), textcolor = MinorBuChoChLine_Color ,size = size.small )
 else 
     Bullish_Minor_ChoCh := false
     Bullish_Minor_BoS   := false
@@ -716,7 +716,7 @@ if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex
         InternalTrend := 'Down Trend'
         if MinorBeChoChLine_Show  == 'On' 
             MinorLine_ChoChBear    := line.new(Minor_LowIndex, Minor_LowLevel , bar_index , Minor_LowLevel , style = MinorBeChoChLine_Style , color = MinorBeChoChLine_Color)
-            MinorLabel_ChoChBear   := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = 'choch' , color = color.rgb(0,0,0,100),
+            MinorLabel_ChoChBear   := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = '$$$' , color = color.rgb(0,0,0,100),
              textcolor = MinorBeChoChLine_Color, style = label.style_label_up ,size = size.small)
 else
     Bearish_Minor_ChoCh := false
