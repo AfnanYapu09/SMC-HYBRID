@@ -3,12 +3,6 @@
 indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
 // === Input Parameters ===
 PP = input.int(5, 'Pivot Period of Order Blocks Detector' , group = 'Logic Parameter' , minval = 1)
-ShZ = input.bool(true , 'Show Zig Zag Line', group = 'Zig Zag Line') 
-ZLS = input.string(line.style_solid , 'Zig Zag Line Style' , options = [line.style_solid ,line.style_dotted , line.style_dashed], group = 'Zig Zag Line' ) 
-ZLC = input.color(color.rgb(0, 0, 0, 46) , 'Zig Zag Line Color' , group = 'Zig Zag Line')  
-ZLW = input.int(1 ,'Zig Zag Line Width' , group = 'Zig Zag Line')
-ShL = input.bool(false , 'Show Label', group = 'Zig Zag Label') 
-LC =  input.color(color.rgb(0, 0, 0) , 'Label Color' , group = 'Zig Zag Label')
 MajorBuBoSLine_Show       = input.string('On'  ,'Show Major Bullish BoS Lines', ['On', 'Off'] , group = 'Major Bullish "BoS" Lines')
 MajorBuBoSLine_Style    = input.string(line.style_solid ,'Style Major Bullish BoS Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bullish "BoS" Lines')
@@ -17,14 +11,14 @@ MajorBeBoSLine_Show       = input.string('On'  ,'Show Major Bearish BoS Lines', 
 MajorBeBoSLine_Style    = input.string(line.style_solid ,'Style Major Bearish BoS Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bearish "BoS" Lines')
 MajorBeBoSLine_Color    = input.color(#030303 ,'Color Major Bearish BoS Lines'  , group = 'Major Bearish "BoS" Lines')
-MinorBuBoSLine_Show       = input.string('Off'  ,'Show Minor Bullish BoS  Lines', ['On', 'Off'] , group = 'Minor Bullish "BoS"  Lines')
-MinorBuBoSLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish BoS  Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Minor Bullish "BoS"  Lines')
-MinorBuBoSLine_Color    = input.color(color.black ,'Color Minor Bullish BoS  Lines' , group = 'Minor Bullish "BoS"  Lines' )
-MinorBeBoSLine_Show       = input.string('Off'  ,'Show Minor Bearish BoS Lines', ['On', 'Off'] , group = 'Minor Bearish "BoS" Lines' )
-MinorBeBoSLine_Style    = input.string(line.style_dashed ,'Style inor Bearish BoS Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Minor Bearish "BoS" Lines')
-MinorBeBoSLine_Color    = input.color(color.black ,'Color inor Bearish BoS Lines' , group = 'Minor Bearish "BoS" Lines')
+MinorBuBoSLine_Show       = input.string('On'  ,'Show Minor Bullish BoS  Lines', ['On', 'Off'] , group = '$$$')
+MinorBuBoSLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish BoS  Lines',
+ [line.style_solid, line.style_dashed, line.style_dotted]  , group = '$$$')
+MinorBuBoSLine_Color    = input.color(color.black ,'Color Minor Bullish BoS  Lines' , group = '$$$' )
+MinorBeBoSLine_Show       = input.string('On'  ,'Show Minor Bearish BoS Lines', ['On', 'Off'] , group = '$$$' )
+MinorBeBoSLine_Style    = input.string(line.style_dashed ,'Style inor Bearish BoS Lines',
+ [line.style_solid, line.style_dashed, line.style_dotted] , group = '$$$')
+MinorBeBoSLine_Color    = input.color(color.black ,'Color inor Bearish BoS Lines' , group = '$$$')
 MajorBuChoChLine_Show     = input.string('On'  ,'Show Major Bullish ChoCh Lines', ['On', 'Off'] , group = 'Major Bullish "ChoCh" Lines')
 MajorBuChoChLine_Style    = input.string(line.style_solid ,'Style Major Bullish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Major Bullish "ChoCh" Lines')
@@ -33,14 +27,14 @@ MajorBeChoChLine_Show     = input.string('On'  ,'Show Major Bearish ChoCh Lines'
 MajorBeChoChLine_Style    = input.string(line.style_solid ,'Style Major Bearish ChoCh Lines', 
  [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bearish "ChoCh" Lines')
 MajorBeChoChLine_Color    = input.color(#ff0000 ,'Color Major Bearish ChoCh Lines'  , group = 'Major Bearish "ChoCh" Lines')
-MinorBuChoChLine_Show     = input.string('Off'  ,'Show Minor Bullish ChoCh Lines', ['On', 'Off'] , group = 'Minor Bullish "ChoCh" Lines')
+MinorBuChoChLine_Show     = input.string('On'  ,'Show Minor Bullish ChoCh Lines', ['On', 'Off'] , group = '$$$')
 MinorBuChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish ChoCh Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Minor Bullish "ChoCh" Lines')
-MinorBuChoChLine_Color    = input.color(color.black ,'Color Minor Bullish ChoCh Lines' , group = 'Minor Bullish "ChoCh" Lines')
-MinorBeChoChLine_Show     = input.string('Off'  ,'Show Minor Bearish ChoCh Lines', ['On', 'Off'] , group = 'Minor Bearish "ChoCh" Lines')
-MinorBeChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bearish ChoCh Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Minor Bearish "ChoCh" Lines')
-MinorBeChoChLine_Color    = input.color(color.black ,'Color Minor Bearish ChoCh Lines'  , group = 'Minor Bearish "ChoCh" Lines')
+ [line.style_solid, line.style_dashed, line.style_dotted] , group = '$$$')
+MinorBuChoChLine_Color    = input.color(color.black ,'Color Minor Bullish ChoCh Lines' , group = '$$$')
+MinorBeChoChLine_Show     = input.string('On'  ,'Show Minor Bearish ChoCh Lines', ['On', 'Off'] , group = '$$$')
+MinorBeChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bearish ChoCh Lines',
+ [line.style_solid, line.style_dashed, line.style_dotted]  , group = '$$$')
+MinorBeChoChLine_Color    = input.color(color.black ,'Color Minor Bearish ChoCh Lines'  , group = '$$$')
 // === Variable Initialization ===
 Open = open
 High = high
