@@ -1,40 +1,32 @@
 //@version=5
 // === Indicator Setup ===
 indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
-// === Input Parameters ===
-PP = input.int(5, 'Pivot Period of Order Blocks Detector' , group = 'Logic Parameter' , minval = 1)
-MajorBuBoSLine_Show       = input.string('On'  ,'Show Major Bullish BoS Lines', ['On', 'Off'] , group = 'Major Bullish "BoS" Lines')
-MajorBuBoSLine_Style    = input.string(line.style_solid ,'Style Major Bullish BoS Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bullish "BoS" Lines')
-MajorBuBoSLine_Color    = input.color(#000000 ,'Color Major Bullish BoS Lines'  , group = 'Major Bullish "BoS" Lines')
-MajorBeBoSLine_Show       = input.string('On'  ,'Show Major Bearish BoS Lines', ['On', 'Off'] , group = 'Major Bearish "BoS" Lines')
-MajorBeBoSLine_Style    = input.string(line.style_solid ,'Style Major Bearish BoS Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bearish "BoS" Lines')
-MajorBeBoSLine_Color    = input.color(#030303 ,'Color Major Bearish BoS Lines'  , group = 'Major Bearish "BoS" Lines')
-MinorBuBoSLine_Show       = input.string('On'  ,'Show Minor Bullish BoS  Lines', ['On', 'Off'] , group = '$$$')
-MinorBuBoSLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish BoS  Lines',
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = '$$$')
-MinorBuBoSLine_Color    = input.color(color.black ,'Color Minor Bullish BoS  Lines' , group = '$$$' )
-MinorBeBoSLine_Show       = input.string('On'  ,'Show Minor Bearish BoS Lines', ['On', 'Off'] , group = '$$$' )
-MinorBeBoSLine_Style    = input.string(line.style_dashed ,'Style inor Bearish BoS Lines',
- [line.style_solid, line.style_dashed, line.style_dotted] , group = '$$$')
-MinorBeBoSLine_Color    = input.color(color.black ,'Color inor Bearish BoS Lines' , group = '$$$')
-MajorBuChoChLine_Show     = input.string('On'  ,'Show Major Bullish ChoCh Lines', ['On', 'Off'] , group = 'Major Bullish "ChoCh" Lines')
-MajorBuChoChLine_Style    = input.string(line.style_solid ,'Style Major Bullish ChoCh Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted] , group = 'Major Bullish "ChoCh" Lines')
-MajorBuChoChLine_Color    = input.color(#ff0000 ,'Color Major Bullish ChoCh Lines' , group = 'Major Bullish "ChoCh" Lines')
-MajorBeChoChLine_Show     = input.string('On'  ,'Show Major Bearish ChoCh Lines', ['On', 'Off'] , group = 'Major Bearish "ChoCh" Lines')
-MajorBeChoChLine_Style    = input.string(line.style_solid ,'Style Major Bearish ChoCh Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = 'Major Bearish "ChoCh" Lines')
-MajorBeChoChLine_Color    = input.color(#ff0000 ,'Color Major Bearish ChoCh Lines'  , group = 'Major Bearish "ChoCh" Lines')
-MinorBuChoChLine_Show     = input.string('On'  ,'Show Minor Bullish ChoCh Lines', ['On', 'Off'] , group = '$$$')
-MinorBuChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bullish ChoCh Lines', 
- [line.style_solid, line.style_dashed, line.style_dotted] , group = '$$$')
-MinorBuChoChLine_Color    = input.color(color.black ,'Color Minor Bullish ChoCh Lines' , group = '$$$')
-MinorBeChoChLine_Show     = input.string('On'  ,'Show Minor Bearish ChoCh Lines', ['On', 'Off'] , group = '$$$')
-MinorBeChoChLine_Style    = input.string(line.style_dashed ,'Style Minor Bearish ChoCh Lines',
- [line.style_solid, line.style_dashed, line.style_dotted]  , group = '$$$')
-MinorBeChoChLine_Color    = input.color(color.black ,'Color Minor Bearish ChoCh Lines'  , group = '$$$')
+// === Default Parameters (configuration removed) ===
+PP = 5
+MajorBuBoSLine_Show       = 'On'
+MajorBuBoSLine_Style      = line.style_solid
+MajorBuBoSLine_Color      = #000000
+MajorBeBoSLine_Show       = 'On'
+MajorBeBoSLine_Style      = line.style_solid
+MajorBeBoSLine_Color      = #030303
+MinorBuBoSLine_Show       = 'On'
+MinorBuBoSLine_Style      = line.style_dashed
+MinorBuBoSLine_Color      = color.black
+MinorBeBoSLine_Show       = 'On'
+MinorBeBoSLine_Style      = line.style_dashed
+MinorBeBoSLine_Color      = color.black
+MajorBuChoChLine_Show     = 'On'
+MajorBuChoChLine_Style    = line.style_solid
+MajorBuChoChLine_Color    = #ff0000
+MajorBeChoChLine_Show     = 'On'
+MajorBeChoChLine_Style    = line.style_solid
+MajorBeChoChLine_Color    = #ff0000
+MinorBuChoChLine_Show     = 'On'
+MinorBuChoChLine_Style    = line.style_dashed
+MinorBuChoChLine_Color    = color.black
+MinorBeChoChLine_Show     = 'On'
+MinorBeChoChLine_Style    = line.style_dashed
+MinorBeChoChLine_Color    = color.black
 // === Variable Initialization ===
 Open = open
 High = high
@@ -637,14 +629,14 @@ if ArrayTypeAdv.size() > 2
 if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex 
     if (ExternalTrend == 'No Trend' or ExternalTrend == 'Up Trend')
         Bullish_Major_BoS := true
-        BoS_MajorType.push('Bull Major BoS')
+        BoS_MajorType.push('Bull Major $$$')
         BoS_MajorIndex.push(bar_index)
         LockBreak_M := Major_HighIndex
         ExternalTrend := 'Up Trend'
         if MajorBuBoSLine_Show == 'On'
             MajorLine_BoSBull     := line.new(Major_HighIndex, Major_HighLevel , bar_index , Major_HighLevel , style = MajorBuBoSLine_Style , color = MajorBuBoSLine_Color)
             MajorLabel_BoSBull    := label.new((Major_HighIndex + bar_index) / 2 , Major_HighLevel   ,
-             text = 'Bos' , color = color.rgb(0,0,0,100), textcolor = MajorBuBoSLine_Color ,size = size.normal )
+             text = '$$$' , color = color.rgb(0,0,0,100), textcolor = MajorBuBoSLine_Color ,size = size.normal )
     else if ExternalTrend == 'Down Trend' 
         Bullish_Major_ChoCh := true
         ChoCh_MajorType.push('Bull Major ChoCh')
@@ -661,14 +653,14 @@ else
 if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex 
     if ExternalTrend == 'No Trend' or ExternalTrend == 'Down Trend'
         Bearish_Major_BoS := true
-        BoS_MajorType.push('Bear Major BoS')
+        BoS_MajorType.push('Bear Major $$$')
         BoS_MajorIndex.push(bar_index)
         LockBreak_M := Major_LowIndex
         ExternalTrend := 'Down Trend'
         if MajorBeBoSLine_Show == 'On'
             MajorLine_BoSBear     := line.new(Major_LowIndex, Major_LowLevel , bar_index , Major_LowLevel , style = MajorBeBoSLine_Style , color = MajorBeBoSLine_Color)
             MajorLabel_BoSBear    := label.new((Major_LowIndex + bar_index) / 2 , Major_LowLevel   ,
-             text = 'Bos' , color = color.rgb(0,0,0,100),
+             text = '$$$' , color = color.rgb(0,0,0,100),
              textcolor = MajorBeBoSLine_Color , style = label.style_label_up ,size = size.normal)        
     else if ExternalTrend == 'Up Trend' 
         Bearish_Major_ChoCh := true
@@ -686,13 +678,13 @@ else
 if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex 
     if (InternalTrend == 'No Trend' or InternalTrend == 'Up Trend') 
         Bullish_Minor_BoS   := true
-        BoS_MinorType.push('Bull Minor BoS')
+        BoS_MinorType.push('Bull Minor $$$')
         BoS_MinorIndex.push(bar_index)
         LockBreak_m := Minor_HighIndex
         InternalTrend := 'Up Trend'
         if MinorBuBoSLine_Show  == 'On' 
             MinorLine_BoSBull     := line.new(Minor_HighIndex, Minor_HighLevel , bar_index , Minor_HighLevel , style = MinorBuBoSLine_Style , color = MinorBuBoSLine_Color)
-            MinorLabel_BoSBull    := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = 'Bos' , color = color.rgb(0,0,0,100), textcolor = MinorBuBoSLine_Color ,size = size.small )
+            MinorLabel_BoSBull    := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = '$$$' , color = color.rgb(0,0,0,100), textcolor = MinorBuBoSLine_Color ,size = size.small )
     else if InternalTrend == 'Down Trend' 
         Bullish_Minor_ChoCh := true
         ChoCh_MinorType.push('Bull Minor ChoCh')
@@ -708,13 +700,13 @@ else
 if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex 
     if InternalTrend == 'No Trend' or InternalTrend == 'Down Trend'
         Bearish_Minor_BoS   := true
-        BoS_MinorType.push('Bear Minor BoS')
+        BoS_MinorType.push('Bear Minor $$$')
         BoS_MinorIndex.push(bar_index)
         LockBreak_m := Minor_LowIndex
         InternalTrend := 'Down Trend'
         if MinorBeBoSLine_Show  == 'On' 
             MinorLine_BoSBear     := line.new(Minor_LowIndex, Minor_LowLevel , bar_index , Minor_LowLevel , style = MinorBeBoSLine_Style , color = MinorBeBoSLine_Color)
-            MinorLabel_BoSBear    := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = 'Bos' , color = color.rgb(0,0,0,100),
+            MinorLabel_BoSBear    := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = '$$$' , color = color.rgb(0,0,0,100),
              textcolor = MinorBeBoSLine_Color , style = label.style_label_up ,size = size.small) 
     else if InternalTrend == 'Up Trend' 
         Bearish_Minor_ChoCh := true
@@ -729,46 +721,3 @@ if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex
 else
     Bearish_Minor_ChoCh := false
     Bearish_Minor_BoS   := false
-// === Imbalance Visualization ===
-showImbalance = input.bool(false, 'Show/Color', group="Imbalance", inline="Imbalance")
-colorImbalance = input.color(#f4f004, '', group="Imbalance", inline="Imbalance")
-if showImbalance
-    bearishImb = high < low[2] and close[1] < open[1]
-    bullishImb = low > high[2] and close[1] > open[1]
-    if bullishImb
-        box.new(left=bar_index[1], top=low, right=bar_index, bottom=high[2], bgcolor=colorImbalance, border_color=colorImbalance)
-    if bearishImb
-        box.new(left=bar_index[1], top=high, right=bar_index, bottom=low[2], bgcolor=colorImbalance, border_color=colorImbalance)
-// === Order Block Visualization ===
-showOrderblock = input.bool(true, 'Show/Color', group="Orderblock", inline="Orderblock")
-colorOrderblock = input.color(color.rgb(0, 252, 63, 76), '', group="Orderblock", inline="Orderblock")
-if showOrderblock
-    if low[0] > high[2]
-        if low[1] > high[3]
-            box.new(left=bar_index[2], top=high[2], right=bar_index, bottom=low[1], bgcolor=colorOrderblock, border_color=colorOrderblock)
-        else
-            if low[2] <= low[1]
-                box.new(left=bar_index[2], top=high[2], right=bar_index, bottom=low[2], bgcolor=colorOrderblock, border_color=colorOrderblock)
-            else
-                box.new(left=bar_index[2], top=high[2], right=bar_index, bottom=low[1], bgcolor=colorOrderblock, border_color=colorOrderblock)
-    if high[0] < low[2]
-        if high[1] < low[3]
-            box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[1], bgcolor=colorOrderblock, border_color=colorOrderblock)
-        else
-            if high[2] <= high[1]
-                box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[1], bgcolor=colorOrderblock, border_color=colorOrderblock)
-            else
-                box.new(left=bar_index[2], top=low[2], right=bar_index, bottom=high[2], bgcolor=colorOrderblock, border_color=colorOrderblock)  
-// === Order Block Parameters ===
-var g0      = 'Order Block Settings'
-barsReq     = input.int(6, 'Consecutive Bars Required', group = g0, tooltip = 'The number of bars required after the last bullish or bearish bar to validate an order block')
-percGain    = input.float(0.0, 'Percent Gain Required', step = 0.1, group = g0, tooltip = 'The minimum percent gain or loss of the consecutive bars required to validate an order block')
-opposites   = input.bool(false, 'Require Opposite Order Block', group = g0, tooltip = 'Requires an order block in the opposite direction of the previous order block before a new order block is marked')
-mitType     = input.string('Wicks', 'Mitigation Type', ['Wicks', 'Close'])
-irrOb       = input.string('Length', 'Irrelevant Order Block ', ['Length', 'Distance'], group = g0, tooltip = 'Method for considering Order Blocks irrelevant. Either too long (length) or too far away from current price (distance)')
-maxObLen    = input.int(150, 'Max Ob Length or Distance', group = g0, tooltip = 'Maximum bar length or % distance away from Order Block to be considered irrelevant')
-var g1      = 'Order Block Display Settings'
-showOb      = input.bool(true, 'Show Order Blocks', group = g1)
-hideOld     = input.bool(false, 'Remove Old or Irrelevant Order Blocks', group = g1)
-bullCol     = input.color(#0033ff26, 'Bullish Color', group = g1)
-bearCol     = input.color(color.new(#ff5252, 85), 'Bearish Color', group = g1)
