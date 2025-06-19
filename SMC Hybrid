@@ -5,28 +5,28 @@ indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 500
 PP = 5
 MajorBuBoSLine_Show       = 'On'
 MajorBuBoSLine_Style      = line.style_solid
-MajorBuBoSLine_Color      = #0000FF
+MajorBuBoSLine_Color      = input.color(#0000FF, "สี Major BOS ขาขึ้น", group="BOS/ChoCh")
 MajorBeBoSLine_Show       = 'On'
 MajorBeBoSLine_Style      = line.style_solid
-MajorBeBoSLine_Color      = #0000FF
+MajorBeBoSLine_Color      = input.color(#0000FF, "สี Major BOS ขาลง", group="BOS/ChoCh")
 MinorBuBoSLine_Show       = 'On'
 MinorBuBoSLine_Style      = line.style_dashed
-MinorBuBoSLine_Color      = color.black
+MinorBuBoSLine_Color      = input.color(color.black, "สี Minor BOS ขาขึ้น", group="BOS/ChoCh")
 MinorBeBoSLine_Show       = 'On'
 MinorBeBoSLine_Style      = line.style_dashed
-MinorBeBoSLine_Color      = color.black
+MinorBeBoSLine_Color      = input.color(color.black, "สี Minor BOS ขาลง", group="BOS/ChoCh")
 MajorBuChoChLine_Show     = 'On'
 MajorBuChoChLine_Style    = line.style_solid
-MajorBuChoChLine_Color    = #ff0000
+MajorBuChoChLine_Color    = input.color(#ff0000, "สี Major ChoCh ขาขึ้น", group="BOS/ChoCh")
 MajorBeChoChLine_Show     = 'On'
 MajorBeChoChLine_Style    = line.style_solid
-MajorBeChoChLine_Color    = #ff0000
+MajorBeChoChLine_Color    = input.color(#ff0000, "สี Major ChoCh ขาลง", group="BOS/ChoCh")
 MinorBuChoChLine_Show     = 'On'
 MinorBuChoChLine_Style    = line.style_dashed
-MinorBuChoChLine_Color    = color.black
+MinorBuChoChLine_Color    = input.color(color.black, "สี Minor ChoCh ขาขึ้น", group="BOS/ChoCh")
 MinorBeChoChLine_Show     = 'On'
 MinorBeChoChLine_Style    = line.style_dashed
-MinorBeChoChLine_Color    = color.black
+MinorBeChoChLine_Color    = input.color(color.black, "สี Minor ChoCh ขาลง", group="BOS/ChoCh")
 // === Variable Initialization ===
 Open = open
 High = high
