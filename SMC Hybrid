@@ -5,14 +5,14 @@ indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 500
 PP = 5
 MajorBoSLine_Show       = 'On'
 MajorBoSLine_Style      = line.style_solid
-MajorBoSLine_Color      = input.color(#0000FF, "สี Major BOS", group="BOS/ChoCh")
-MinorBoSLine_Show       = 'On'
-MinorBoSLine_Style      = line.style_dashed
-MinorLine_Color         = input.color(color.black, "สี Minor BOS/ChoCh", group="BOS/ChoCh")
-MinorBoSLine_Color      = MinorLine_Color
+MajorBoSLine_Color      = input.color(color.blue, "BOS", group="BOS/ChoCh")
 MajorChoChLine_Show     = 'On'
 MajorChoChLine_Style    = line.style_solid
-MajorChoChLine_Color    = input.color(#ff0000, "สี Major ChoCh", group="BOS/ChoCh")
+MajorChoChLine_Color    = input.color(#ff0000, "ChoCh", group="BOS/ChoCh")
+MinorBoSLine_Show       = 'On'
+MinorBoSLine_Style      = line.style_dashed
+MinorLine_Color         = input.color(color.black, "$$$", group="BOS/ChoCh")
+MinorBoSLine_Color      = MinorLine_Color
 MinorChoChLine_Show     = 'On'
 MinorChoChLine_Style    = line.style_dashed
 MinorChoChLine_Color    = MinorLine_Color
