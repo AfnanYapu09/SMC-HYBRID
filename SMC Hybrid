@@ -507,8 +507,8 @@ else
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // === INPUTS ===
 showOrderblock = input.bool(true, "Show Order Blocks")
-colorBull      = input.color(#0066ff26,  "Bullish OB Color")
-colorBear      = input.color(color.rgb(255, 82, 82, 85),  "Bearish OB Color")
+colorBull      = input.color(#0066ff33,  "Bullish OB Color")
+colorBear      = input.color(color.rgb(255, 82, 82, 80),  "Bearish OB Color")
 maxBoxes       = input.int(6, "Max Boxes")
 
 // === ARRAYS ===
@@ -522,10 +522,16 @@ if showOrderblock
         box ob = na
         if low[1] > high[3]
             ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = color.new(colorBull, 100))
+            box.set_text(ob, "Dz")
+            box.set_text_halign(ob, text.align_right)
         else if low[2] <= low[1]
             ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[2], bgcolor = colorBull, border_color = color.new(colorBull, 100))
+            box.set_text(ob, "Dz")
+            box.set_text_halign(ob, text.align_right)
         else
             ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = color.new(colorBull, 100))
+            box.set_text(ob, "Dz")
+            box.set_text_halign(ob, text.align_right)
         array.push(bullBoxes, ob)
         if array.size(bullBoxes) > maxBoxes
             oldbx = array.shift(bullBoxes)
@@ -536,10 +542,16 @@ if showOrderblock
         box ob = na
         if high[1] < low[3]
             ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = color.new(colorBear, 100))
+            box.set_text(ob, "Sz")
+            box.set_text_halign(ob, text.align_right)
         else if high[2] <= high[1]
             ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = color.new(colorBear, 100))
+            box.set_text(ob, "Sz")
+            box.set_text_halign(ob, text.align_right)
         else
             ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[2], bgcolor = colorBear, border_color = color.new(colorBear, 100))
+            box.set_text(ob, "Sz")
+            box.set_text_halign(ob, text.align_right)
         array.push(bearBoxes, ob)
         if array.size(bearBoxes) > maxBoxes
             oldbx = array.shift(bearBoxes)
