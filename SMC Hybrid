@@ -5,10 +5,10 @@ indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 500
 PP = 5
 MajorBuBoSLine_Show       = 'On'
 MajorBuBoSLine_Style      = line.style_solid
-MajorBuBoSLine_Color      = #000000
+MajorBuBoSLine_Color      = #0000FF
 MajorBeBoSLine_Show       = 'On'
 MajorBeBoSLine_Style      = line.style_solid
-MajorBeBoSLine_Color      = #030303
+MajorBeBoSLine_Color      = #0000FF
 MinorBuBoSLine_Show       = 'On'
 MinorBuBoSLine_Style      = line.style_dashed
 MinorBuBoSLine_Color      = color.black
