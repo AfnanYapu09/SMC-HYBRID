@@ -122,6 +122,8 @@ var line MinorLine_BoSBear     = na
 var label MinorLabel_BoSBear   = na
 var line MinorHighLevelLine    = na
 var line MinorLowLevelLine     = na
+var bool MinorHighLineActive   = false
+var bool MinorLowLineActive    = false
 var bool Bullish_Major_ChoCh = false
 var bool Bullish_Major_BoS = false
 var bool Bearish_Major_ChoCh = false
@@ -720,20 +722,32 @@ if MinorLevelLine_Show == 'On'
     if not na(Minor_HighLevel)
         if MinorHighLevelLine == na or Minor_HighIndex != line.get_x1(MinorHighLevelLine)
             MinorHighLevelLine := line.new(Minor_HighIndex, Minor_HighLevel, bar_index, Minor_HighLevel, extend = extend.right, style = MinorLevelLine_Style, color = MinorLevelLine_Color)
-        else
+            MinorHighLineActive := true
+        else if MinorHighLineActive
             line.set_xy2(MinorHighLevelLine, bar_index, Minor_HighLevel)
+        if MinorHighLineActive and High >= Minor_HighLevel and Low <= Minor_HighLevel
+            line.set_xy2(MinorHighLevelLine, bar_index, Minor_HighLevel)
+            line.set_extend(MinorHighLevelLine, extend.none)
+            MinorHighLineActive := false
     else if MinorHighLevelLine != na
         line.delete(MinorHighLevelLine)
         MinorHighLevelLine := na
+        MinorHighLineActive := false
 
     if not na(Minor_LowLevel)
         if MinorLowLevelLine == na or Minor_LowIndex != line.get_x1(MinorLowLevelLine)
             MinorLowLevelLine := line.new(Minor_LowIndex, Minor_LowLevel, bar_index, Minor_LowLevel, extend = extend.right, style = MinorLevelLine_Style, color = MinorLevelLine_Color)
-        else
+            MinorLowLineActive := true
+        else if MinorLowLineActive
             line.set_xy2(MinorLowLevelLine, bar_index, Minor_LowLevel)
+        if MinorLowLineActive and High >= Minor_LowLevel and Low <= Minor_LowLevel
+            line.set_xy2(MinorLowLevelLine, bar_index, Minor_LowLevel)
+            line.set_extend(MinorLowLevelLine, extend.none)
+            MinorLowLineActive := false
     else if MinorLowLevelLine != na
         line.delete(MinorLowLevelLine)
         MinorLowLevelLine := na
+        MinorLowLineActive := false
 else
     if MinorHighLevelLine != na
         line.delete(MinorHighLevelLine)
