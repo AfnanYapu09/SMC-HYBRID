@@ -16,6 +16,7 @@ minorBoSLineColor      = minorLineColor
 minorChoChLineShow     = 'On'
 minorChoChLineStyle    = line.style_dashed
 minorChoChLineColor    = minorLineColor
+showDollarLabel       = input.bool(true, "$$$", group="BOS/ChoCh")
 // === Variable Initialization ===
 Open = open
 High = high
@@ -470,7 +471,7 @@ if  minorHighLevel < close  and  lockBreakm != minorHighIndex
         bosMinorIndex.push(bar_index)
         lockBreakm := minorHighIndex
         internalTrend := 'Up Trend'
-        if minorBoSLineShow  == 'On'
+        if minorBoSLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorHighIndex, minorHighLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_down, size.small, extend.none)
     else if internalTrend == 'Down Trend' 
         bullishMinorChoCh := true
@@ -478,7 +479,7 @@ if  minorHighLevel < close  and  lockBreakm != minorHighIndex
         chochMinorIndex.push(bar_index)
         lockBreakm := minorHighIndex
         internalTrend := 'Up Trend'
-        if minorChoChLineShow  == 'On'
+        if minorChoChLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorHighIndex, minorHighLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_down, size.small, extend.none)
 else 
     bullishMinorChoCh := false
@@ -490,7 +491,7 @@ if  minorLowLevel > close and  lockBreakm!= minorLowIndex
         bosMinorIndex.push(bar_index)
         lockBreakm := minorLowIndex
         internalTrend := 'Down Trend'
-        if minorBoSLineShow  == 'On'
+        if minorBoSLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorLowIndex, minorLowLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_up, size.small, extend.none)
     else if internalTrend == 'Up Trend' 
         bearishMinorChoCh := true
@@ -498,7 +499,7 @@ if  minorLowLevel > close and  lockBreakm!= minorLowIndex
         chochMinorIndex.push(bar_index)
         lockBreakm := minorLowIndex
         internalTrend := 'Down Trend'
-        if minorChoChLineShow  == 'On'
+        if minorChoChLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorLowIndex, minorLowLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_up, size.small, extend.none)
 else
     bearishMinorChoCh := false
