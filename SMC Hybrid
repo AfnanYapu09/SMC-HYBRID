@@ -29,8 +29,6 @@ var ArrayIndex =  array.new_int()
 var ArrayTypeAdv  = array.new_string()
 var ArrayValueAdv = array.new_float()
 var ArrayIndexAdv =  array.new_int()  
-var line Sline = na 
-var line Rline = na 
 PASS = 0
 HighPivot = ta.pivothigh(PP,PP)
 LowPivot = ta.pivotlow(PP,PP)
@@ -55,68 +53,6 @@ var string Minor_LowType  = na
 var int LockDetecteM_MinorLvL = 0
 var bool Lock0 = true
 var bool Lock1 = true
-var int LastMHH = 0
-var int Last02MHH = 0
-var int LastMLH = 0
-var int LastMLL = 0
-var int Last02MLL = 0
-var int LastMHL = 0
-var int LastmHH = 0
-var int Last02mHH = 0
-var int LastmLH = 0
-var int LastmLL = 0
-var int Last02mLL = 0
-var int LastmHL = 0
-var string LastPivotType = na
-var int LastPivotIndex = 0
-var string LastPivotType02 = na
-var int LastPivotIndex02 = 0
-var float MajorHighValue01 = na
-var int   MajorHighIndex01 = na
-var string MajorHighType01 = ''
-var float MajorLowValue01  = na
-var int   MajorLowIndex01 =  na
-var string MajorLowType01 =  ''
-var float MinorHighValue01 = na
-var int   MinorHighIndex01 = na
-var string MinorHighType01 = ''
-var float MinorLowValue01  = na
-var int   MinorLowIndex01  = na
-var string MinorLowType01 =  ''
-var float MajorHighValue02 = na
-var int   MajorHighIndex02 = na
-var string MajorHighType02 = ''
-var float MajorLowValue02  = na
-var int   MajorLowIndex02 =  na
-var string MajorLowType02 =  ''
-var float MinorHighValue02 = na
-var int   MinorHighIndex02 = na
-var string MinorHighType02 = ''
-var float MinorLowValue02  = na
-var int   MinorLowIndex02  = na
-var string MinorLowType02 =  ''
-var float MajorHighValue02Ch = na
-var int   MajorHighIndex02Ch = na
-var string MajorHighType02Ch = ''
-var float MajorLowValue02Ch  = na
-var int   MajorLowIndex02Ch =  na
-var string MajorLowType02Ch =  ''
-var line MajorLine_ChoChBull   = na
-var label MajorLabel_ChoChBull = na
-var line MajorLine_ChoChBear   = na
-var label MajorLabel_ChoChBear = na
-var line MajorLine_BoSBull     = na
-var label MajorLabel_BoSBull   = na
-var line MajorLine_BoSBear     = na
-var label MajorLabel_BoSBear   = na
-var line MinorLine_ChoChBull   = na
-var label MinorLabel_ChoChBull = na
-var line MinorLine_ChoChBear   = na
-var label MinorLabel_ChoChBear = na
-var line MinorLine_BoSBull     = na
-var label MinorLabel_BoSBull   = na
-var line MinorLine_BoSBear     = na
-var label MinorLabel_BoSBear   = na
 var bool Bullish_Major_ChoCh = false
 var bool Bullish_Major_BoS = false
 var bool Bearish_Major_ChoCh = false
@@ -137,6 +73,11 @@ var ChoCh_MinorIndex = array.new_int()
 var int LockBreak_m = 0 
 var string ExternalTrend = 'No Trend'
 var string InternalTrend = 'No Trend'
+
+f_drawLineLabel(idx, lvl, lstyle, lcolor, txt, labStyle, labSize, ext=extend.none) =>
+    line.new(idx, lvl, bar_index, lvl, style=lstyle, color=lcolor, extend=ext)
+    label.new((idx + bar_index) / 2, lvl, text=txt, color=color.rgb(0,0,0,100),
+              textcolor=lcolor, style=labStyle, size=labSize)
 // === Pivot and Trend Logic ===
 if HighPivot  and  LowPivot
     if ArrayType.size() == 0
@@ -425,101 +366,6 @@ if ArrayValueAdv.size() > 1
             Major_LowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             Major_LowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             Major_LowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-if ArrayTypeAdv.size() > 1
-    LastPivotType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-    LastPivotIndex := ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    LastPivotType02 := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    LastPivotIndex02 := ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'MHH'
-        MajorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MajorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MajorHighType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastMHH            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'MLH'
-        MajorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MajorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MajorHighType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastMLH            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'MLL'
-        MajorLowValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MajorLowIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MajorLowType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastMLL            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'MHL'
-        MajorLowValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MajorLowIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MajorLowType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastMHL            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'mHH'
-        MinorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MinorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MinorHighType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastmHH            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'mLH'
-        MinorHighValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MinorHighIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MinorHighType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastmLH            :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'mLL'
-        MinorLowValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MinorLowIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MinorLowType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastmLL           :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) ==  'mHL'
-        MinorLowValue01   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
-        MinorLowIndex01   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-        MinorLowType01    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-        LastmHL           :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
-if ArrayTypeAdv.size() > 1
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHH'
-        MajorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MajorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MajorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLH'
-        MajorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MajorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MajorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLL'
-        MajorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MajorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MajorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHL'
-        MajorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MajorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MajorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mHH'
-        MinorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MinorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MinorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mLH'
-        MinorHighValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MinorHighIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MinorHighType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mLL'
-        MinorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MinorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MinorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'mHL'
-        MinorLowValue02   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-        MinorLowIndex02   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-        MinorLowType02    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-    if ArrayTypeAdv.get(ArrayTypeAdv.size()-2) != ArrayTypeAdv.get(ArrayTypeAdv.size()-2)[1] 
-        if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHH'
-            MajorHighValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-            MajorHighIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-            MajorHighType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-        if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLH'
-            MajorHighValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-            MajorHighIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-            MajorHighType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-        if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MLL'
-            MajorLowValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-            MajorLowIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-            MajorLowType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-        if  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) ==  'MHL'
-            MajorLowValue02Ch   :=  ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
-            MajorLowIndex02Ch   :=  ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
-            MajorLowType02Ch    :=  ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
 if ArrayTypeAdv.size() > 2  
     LockDetecteM_MinorLvL := 1
     if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'m') == 0 and
@@ -623,9 +469,7 @@ if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex
         LockBreak_M := Major_HighIndex
         ExternalTrend := 'Up Trend'
         if MajorBoSLine_Show == 'On'
-            MajorLine_BoSBull     := line.new(Major_HighIndex, Major_HighLevel , bar_index , Major_HighLevel , style = MajorBoSLine_Style , color = MajorBoSLine_Color)
-            MajorLabel_BoSBull    := label.new((Major_HighIndex + bar_index) / 2 , Major_HighLevel   ,
-             text = 'Bos' , color = color.rgb(0,0,0,100), textcolor = MajorBoSLine_Color ,size = size.normal )
+            f_drawLineLabel(Major_HighIndex, Major_HighLevel, MajorBoSLine_Style, MajorBoSLine_Color, 'Bos', label.style_label_down, size.normal)
     else if ExternalTrend == 'Down Trend' 
         Bullish_Major_ChoCh := true
         ChoCh_MajorType.push('Bull Major ChoCh')
@@ -633,9 +477,7 @@ if  ta.crossover(close , Major_HighLevel) and  LockBreak_M != Major_HighIndex
         LockBreak_M := Major_HighIndex
         ExternalTrend := 'Up Trend'
         if MajorChoChLine_Show == 'On'
-            MajorLine_ChoChBull    := line.new(Major_HighIndex, Major_HighLevel , bar_index , Major_HighLevel , style = MajorChoChLine_Style , color = MajorChoChLine_Color)
-            MajorLabel_ChoChBull   := label.new((Major_HighIndex + bar_index) / 2 , Major_HighLevel   ,
-             text = 'choch' , color = color.rgb(0,0,0,100), textcolor = MajorChoChLine_Color ,size = size.normal )
+            f_drawLineLabel(Major_HighIndex, Major_HighLevel, MajorChoChLine_Style, MajorChoChLine_Color, 'choch', label.style_label_down, size.normal)
 else
     Bullish_Major_ChoCh := false
     Bullish_Major_BoS   := false 
@@ -647,10 +489,7 @@ if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex
         LockBreak_M := Major_LowIndex
         ExternalTrend := 'Down Trend'
         if MajorBoSLine_Show == 'On'
-            MajorLine_BoSBear     := line.new(Major_LowIndex, Major_LowLevel , bar_index , Major_LowLevel , style = MajorBoSLine_Style , color = MajorBoSLine_Color)
-            MajorLabel_BoSBear    := label.new((Major_LowIndex + bar_index) / 2 , Major_LowLevel   ,
-             text = 'Bos' , color = color.rgb(0,0,0,100),
-             textcolor = MajorBoSLine_Color , style = label.style_label_up ,size = size.normal)        
+            f_drawLineLabel(Major_LowIndex, Major_LowLevel, MajorBoSLine_Style, MajorBoSLine_Color, 'Bos', label.style_label_up, size.normal)
     else if ExternalTrend == 'Up Trend' 
         Bearish_Major_ChoCh := true
         ChoCh_MajorType.push('Bear Major ChoCh')
@@ -658,9 +497,7 @@ if  ta.crossunder(close, Major_LowLevel) and  LockBreak_M!= Major_LowIndex
         LockBreak_M := Major_LowIndex
         ExternalTrend := 'Down Trend'
         if MajorChoChLine_Show == 'On'
-            MajorLine_ChoChBear    := line.new(Major_LowIndex, Major_LowLevel , bar_index , Major_LowLevel , style = MajorChoChLine_Style , color = MajorChoChLine_Color)
-            MajorLabel_ChoChBear   := label.new((Major_LowIndex + bar_index) / 2 , Major_LowLevel   ,
-             text = 'choch' , color = color.rgb(0,0,0,100), textcolor = MajorChoChLine_Color, style = label.style_label_up ,size = size.normal)
+            f_drawLineLabel(Major_LowIndex, Major_LowLevel, MajorChoChLine_Style, MajorChoChLine_Color, 'choch', label.style_label_up, size.normal)
 else 
     Bearish_Major_ChoCh := false 
     Bearish_Major_BoS   := false 
@@ -671,18 +508,16 @@ if  Minor_HighLevel < close  and  LockBreak_m != Minor_HighIndex
         BoS_MinorIndex.push(bar_index)
         LockBreak_m := Minor_HighIndex
         InternalTrend := 'Up Trend'
-        if MinorBoSLine_Show  == 'On' 
-            MinorLine_BoSBull     := line.new(Minor_HighIndex, Minor_HighLevel , bar_index , Minor_HighLevel , style = MinorBoSLine_Style , color = MinorBoSLine_Color, extend = extend.none)
-            MinorLabel_BoSBull    := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = '$$$' , color = color.rgb(0,0,0,100), textcolor = MinorBoSLine_Color ,size = size.small )
+        if MinorBoSLine_Show  == 'On'
+            f_drawLineLabel(Minor_HighIndex, Minor_HighLevel, MinorBoSLine_Style, MinorBoSLine_Color, '$$$', label.style_label_down, size.small, extend.none)
     else if InternalTrend == 'Down Trend' 
         Bullish_Minor_ChoCh := true
         ChoCh_MinorType.push('Bull Minor ChoCh')
         ChoCh_MinorIndex.push(bar_index)
         LockBreak_m := Minor_HighIndex
         InternalTrend := 'Up Trend'
-        if MinorChoChLine_Show  == 'On'         
-            MinorLine_ChoChBull    := line.new(Minor_HighIndex, Minor_HighLevel , bar_index , Minor_HighLevel , style = MinorChoChLine_Style , color = MinorChoChLine_Color, extend = extend.none)
-            MinorLabel_ChoChBull   := label.new((Minor_HighIndex + bar_index) / 2 , Minor_HighLevel   , text = '$$$' , color = color.rgb(0,0,0,100), textcolor = MinorChoChLine_Color ,size = size.small )
+        if MinorChoChLine_Show  == 'On'
+            f_drawLineLabel(Minor_HighIndex, Minor_HighLevel, MinorChoChLine_Style, MinorChoChLine_Color, '$$$', label.style_label_down, size.small, extend.none)
 else 
     Bullish_Minor_ChoCh := false
     Bullish_Minor_BoS   := false
@@ -693,20 +528,16 @@ if  Minor_LowLevel > close and  LockBreak_m!= Minor_LowIndex
         BoS_MinorIndex.push(bar_index)
         LockBreak_m := Minor_LowIndex
         InternalTrend := 'Down Trend'
-        if MinorBoSLine_Show  == 'On' 
-            MinorLine_BoSBear     := line.new(Minor_LowIndex, Minor_LowLevel , bar_index , Minor_LowLevel , style = MinorBoSLine_Style , color = MinorBoSLine_Color, extend = extend.none)
-            MinorLabel_BoSBear    := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = '$$$' , color = color.rgb(0,0,0,100),
-             textcolor = MinorBoSLine_Color , style = label.style_label_up ,size = size.small) 
+        if MinorBoSLine_Show  == 'On'
+            f_drawLineLabel(Minor_LowIndex, Minor_LowLevel, MinorBoSLine_Style, MinorBoSLine_Color, '$$$', label.style_label_up, size.small, extend.none)
     else if InternalTrend == 'Up Trend' 
         Bearish_Minor_ChoCh := true
         ChoCh_MinorType.push('Bear Minor ChoCh')
         ChoCh_MinorIndex.push(bar_index)
         LockBreak_m := Minor_LowIndex
         InternalTrend := 'Down Trend'
-        if MinorChoChLine_Show  == 'On' 
-            MinorLine_ChoChBear    := line.new(Minor_LowIndex, Minor_LowLevel , bar_index , Minor_LowLevel , style = MinorChoChLine_Style , color = MinorChoChLine_Color, extend = extend.none)
-            MinorLabel_ChoChBear   := label.new((Minor_LowIndex + bar_index) / 2 , Minor_LowLevel   , text = '$$$' , color = color.rgb(0,0,0,100),
-             textcolor = MinorChoChLine_Color, style = label.style_label_up ,size = size.small)
+        if MinorChoChLine_Show  == 'On'
+            f_drawLineLabel(Minor_LowIndex, Minor_LowLevel, MinorChoChLine_Style, MinorChoChLine_Color, '$$$', label.style_label_up, size.small, extend.none)
 else
     Bearish_Minor_ChoCh := false
     Bearish_Minor_BoS   := false
