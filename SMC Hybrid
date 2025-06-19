@@ -4,17 +4,21 @@ indicator("SMC Hybrid V.1.2" ,'SMC V.1.2', overlay = true, max_bars_back = 5000,
 // === Default Parameters (configuration removed) ===
 PP = 5
 majorBoSLineShow       = 'On'
-majorBoSLineStyle      = line.style_solid
+majorBoSLineStyleInput = input.string("Solid", "Major BOS Line Style", options=["Solid", "Dashed", "Dotted"], group="BOS/ChoCh")
+majorBoSLineStyle      = majorBoSLineStyleInput == "Solid" ? line.style_solid : majorBoSLineStyleInput == "Dashed" ? line.style_dashed : line.style_dotted
 majorBoSLineColor      = input.color(color.black, "Bos", group="BOS/ChoCh")
 majorChoChLineShow     = 'On'
-majorChoChLineStyle    = line.style_solid
+majorChoChLineStyleInput = input.string("Solid", "Major ChoCh Line Style", options=["Solid", "Dashed", "Dotted"], group="BOS/ChoCh")
+majorChoChLineStyle    = majorChoChLineStyleInput == "Solid" ? line.style_solid : majorChoChLineStyleInput == "Dashed" ? line.style_dashed : line.style_dotted
 majorChoChLineColor    = input.color(#ff0000, "ChoCh", group="BOS/ChoCh")
 minorBoSLineShow       = 'On'
-minorBoSLineStyle      = line.style_dashed
+minorBoSLineStyleInput = input.string("Dashed", "Minor BOS Line Style", options=["Solid", "Dashed", "Dotted"], group="BOS/ChoCh")
+minorBoSLineStyle      = minorBoSLineStyleInput == "Solid" ? line.style_solid : minorBoSLineStyleInput == "Dashed" ? line.style_dashed : line.style_dotted
 minorLineColor         = input.color(#363a45ce, "liquidity", group="BOS/ChoCh")
 minorBoSLineColor      = minorLineColor
 minorChoChLineShow     = 'On'
-minorChoChLineStyle    = line.style_dashed
+minorChoChLineStyleInput = input.string("Dashed", "Minor ChoCh Line Style", options=["Solid", "Dashed", "Dotted"], group="BOS/ChoCh")
+minorChoChLineStyle    = minorChoChLineStyleInput == "Solid" ? line.style_solid : minorChoChLineStyleInput == "Dashed" ? line.style_dashed : line.style_dotted
 minorChoChLineColor    = minorLineColor
 showDollarLabel       = input.bool(true, "liquidity", group="BOS/ChoCh")
 potentialGroup        = "Potential Levels"
