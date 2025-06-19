@@ -1,6 +1,6 @@
 //@version=5
 // === Indicator Setup ===
-indicator("SMC by.AFnan V.1.2" ,'SMC V.1.2', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
+indicator("SMC Hybrid V.1.2" ,'SMC V.1.2', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
 // === Default Parameters (configuration removed) ===
 PP = 5
 majorBoSLineShow       = 'On'
@@ -11,12 +11,12 @@ majorChoChLineStyle    = line.style_solid
 majorChoChLineColor    = input.color(#ff0000, "ChoCh", group="BOS/ChoCh")
 minorBoSLineShow       = 'On'
 minorBoSLineStyle      = line.style_dashed
-minorLineColor         = input.color(#363a45ce, "$$$", group="BOS/ChoCh")
+minorLineColor         = input.color(#363a45ce, "liquidity", group="BOS/ChoCh")
 minorBoSLineColor      = minorLineColor
 minorChoChLineShow     = 'On'
 minorChoChLineStyle    = line.style_dashed
 minorChoChLineColor    = minorLineColor
-showDollarLabel       = input.bool(true, "$$$", group="BOS/ChoCh")
+showDollarLabel       = input.bool(true, "liquidity", group="BOS/ChoCh")
 // === Variable Initialization ===
 Open = open
 High = high
