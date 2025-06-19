@@ -122,8 +122,8 @@ var line MinorLine_BoSBear     = na
 var label MinorLabel_BoSBear   = na
 var line MinorHighLevelLine    = na
 var line MinorLowLevelLine     = na
-var bool MinorHighLineActive   = false
-var bool MinorLowLineActive    = false
+var bool MinorHighLineDrawn    = false
+var bool MinorLowLineDrawn     = false
 var bool Bullish_Major_ChoCh = false
 var bool Bullish_Major_BoS = false
 var bool Bearish_Major_ChoCh = false
@@ -720,34 +720,28 @@ else
 
 if MinorLevelLine_Show == 'On'
     if not na(Minor_HighLevel)
-        if MinorHighLevelLine == na or Minor_HighIndex != line.get_x1(MinorHighLevelLine)
-            MinorHighLevelLine := line.new(Minor_HighIndex, Minor_HighLevel, bar_index, Minor_HighLevel, extend = extend.right, style = MinorLevelLine_Style, color = MinorLevelLine_Color)
-            MinorHighLineActive := true
-        else if MinorHighLineActive
-            line.set_xy2(MinorHighLevelLine, bar_index, Minor_HighLevel)
-        if MinorHighLineActive and High >= Minor_HighLevel and Low <= Minor_HighLevel
-            line.set_xy2(MinorHighLevelLine, bar_index, Minor_HighLevel)
-            line.set_extend(MinorHighLevelLine, extend.none) // หยุดต่อเส้นเมื่อแท่งเทียนสัมผัส
-            MinorHighLineActive := false
-    else if MinorHighLevelLine != na
-        line.delete(MinorHighLevelLine)
-        MinorHighLevelLine := na
-        MinorHighLineActive := false
+        if Minor_HighLevel != Minor_HighLevel[1]
+            MinorHighLineDrawn := false
+        if not MinorHighLineDrawn and High >= Minor_HighLevel and Low <= Minor_HighLevel
+            MinorHighLevelLine := line.new(Minor_HighIndex, Minor_HighLevel, bar_index, Minor_HighLevel, extend = extend.none, style = MinorLevelLine_Style, color = MinorLevelLine_Color)
+            MinorHighLineDrawn := true
+    else
+        if MinorHighLevelLine != na
+            line.delete(MinorHighLevelLine)
+            MinorHighLevelLine := na
+        MinorHighLineDrawn := false
 
     if not na(Minor_LowLevel)
-        if MinorLowLevelLine == na or Minor_LowIndex != line.get_x1(MinorLowLevelLine)
-            MinorLowLevelLine := line.new(Minor_LowIndex, Minor_LowLevel, bar_index, Minor_LowLevel, extend = extend.right, style = MinorLevelLine_Style, color = MinorLevelLine_Color)
-            MinorLowLineActive := true
-        else if MinorLowLineActive
-            line.set_xy2(MinorLowLevelLine, bar_index, Minor_LowLevel)
-        if MinorLowLineActive and High >= Minor_LowLevel and Low <= Minor_LowLevel
-            line.set_xy2(MinorLowLevelLine, bar_index, Minor_LowLevel)
-            line.set_extend(MinorLowLevelLine, extend.none)  // หยุดต่อเส้นเมื่อแท่งเทียนสัมผัส
-            MinorLowLineActive := false
-    else if MinorLowLevelLine != na
-        line.delete(MinorLowLevelLine)
-        MinorLowLevelLine := na
-        MinorLowLineActive := false
+        if Minor_LowLevel != Minor_LowLevel[1]
+            MinorLowLineDrawn := false
+        if not MinorLowLineDrawn and High >= Minor_LowLevel and Low <= Minor_LowLevel
+            MinorLowLevelLine := line.new(Minor_LowIndex, Minor_LowLevel, bar_index, Minor_LowLevel, extend = extend.none, style = MinorLevelLine_Style, color = MinorLevelLine_Color)
+            MinorLowLineDrawn := true
+    else
+        if MinorLowLevelLine != na
+            line.delete(MinorLowLevelLine)
+            MinorLowLevelLine := na
+        MinorLowLineDrawn := false
 else
     if MinorHighLevelLine != na
         line.delete(MinorHighLevelLine)
