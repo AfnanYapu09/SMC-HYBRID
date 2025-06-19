@@ -1,17 +1,17 @@
 //@version=5
 // === Indicator Setup ===
-indicator("SMC by.AFnan V.1.1" ,'SMC V.1.1', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
+indicator("SMC by.AFnan V.1.2" ,'SMC V.1.2', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
 // === Default Parameters (configuration removed) ===
 PP = 5
 majorBoSLineShow       = 'On'
 majorBoSLineStyle      = line.style_solid
-majorBoSLineColor      = input.color(color.blue, "BOS", group="BOS/ChoCh")
+majorBoSLineColor      = input.color(color.black, "Bos", group="BOS/ChoCh")
 majorChoChLineShow     = 'On'
 majorChoChLineStyle    = line.style_solid
 majorChoChLineColor    = input.color(#ff0000, "ChoCh", group="BOS/ChoCh")
 minorBoSLineShow       = 'On'
 minorBoSLineStyle      = line.style_dashed
-minorLineColor         = input.color(color.black, "$$$", group="BOS/ChoCh")
+minorLineColor         = input.color(#363a45ce, "$$$", group="BOS/ChoCh")
 minorBoSLineColor      = minorLineColor
 minorChoChLineShow     = 'On'
 minorChoChLineStyle    = line.style_dashed
@@ -508,9 +508,10 @@ else
 // === INPUTS ===
 obGroup      = "Order Blocks"
 var bool showOrderblock = true
+maxBoxes     = input.int(6, "Max Boxes", group=obGroup)
 colorBull    = input.color(#0066ff33, "Bullish OB Color", group=obGroup)
 colorBear    = input.color(color.rgb(255, 82, 82, 80), "Bearish OB Color", group=obGroup)
-maxBoxes     = input.int(6, "Max Boxes", group=obGroup)
+
 
 // === ARRAYS ===
 var box[] bullBoxes = array.new_box()
@@ -589,4 +590,3 @@ if array.size(bearBoxes) > 0
         if high >= box.get_top(bx)  // touched top of Supply OB
             box.delete(bx)
             array.remove(bearBoxes, i)
-
