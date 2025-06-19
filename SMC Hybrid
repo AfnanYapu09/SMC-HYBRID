@@ -521,11 +521,11 @@ if showOrderblock
     if low > high[2]
         box ob = na
         if low[1] > high[3]
-            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = colorBull)
+            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = color.new(colorBull, 100))
         else if low[2] <= low[1]
-            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[2], bgcolor = colorBull, border_color = colorBull)
+            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[2], bgcolor = colorBull, border_color = color.new(colorBull, 100))
         else
-            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = colorBull)
+            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = color.new(colorBull, 100))
         array.push(bullBoxes, ob)
         if array.size(bullBoxes) > maxBoxes
             oldbx = array.shift(bullBoxes)
@@ -535,11 +535,11 @@ if showOrderblock
     if high < low[2]
         box ob = na
         if high[1] < low[3]
-            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = colorBear)
+            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = color.new(colorBear, 100))
         else if high[2] <= high[1]
-            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = colorBear)
+            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = color.new(colorBear, 100))
         else
-            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[2], bgcolor = colorBear, border_color = colorBear)
+            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[2], bgcolor = colorBear, border_color = color.new(colorBear, 100))
         array.push(bearBoxes, ob)
         if array.size(bearBoxes) > maxBoxes
             oldbx = array.shift(bearBoxes)
