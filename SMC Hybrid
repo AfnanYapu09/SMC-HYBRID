@@ -506,10 +506,11 @@ else
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // === INPUTS ===
-showOrderblock = input.bool(true, "Show Order Blocks")
-colorBull      = input.color(#0066ff33,  "Bullish OB Color")
-colorBear      = input.color(color.rgb(255, 82, 82, 80),  "Bearish OB Color")
-maxBoxes       = input.int(6, "Max Boxes")
+obGroup      = "Order Blocks"
+var bool showOrderblock = true
+colorBull    = input.color(#0066ff33, "Bullish OB Color", group=obGroup)
+colorBear    = input.color(color.rgb(255, 82, 82, 80), "Bearish OB Color", group=obGroup)
+maxBoxes     = input.int(6, "Max Boxes", group=obGroup)
 
 // === ARRAYS ===
 var box[] bullBoxes = array.new_box()
