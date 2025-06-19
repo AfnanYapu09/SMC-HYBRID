@@ -19,7 +19,8 @@ minorChoChLineColor    = minorLineColor
 showDollarLabel       = input.bool(true, "liquidity", group="BOS/ChoCh")
 potentialGroup        = "Potential Levels"
 showPotential         = input.bool(true, "Show Potential BOS/ChoCh", group=potentialGroup)
-potentialStyle        = input.line_style(line.style_dotted, "Line Style", group=potentialGroup)
+potentialStyleInput   = input.string("Dotted", "Line Style", options=["Solid", "Dashed", "Dotted"], group=potentialGroup)
+potentialStyle        = potentialStyleInput == "Solid" ? line.style_solid : potentialStyleInput == "Dashed" ? line.style_dashed : line.style_dotted
 potentialColor        = input.color(color.gray, "Line Color", group=potentialGroup)
 // === Variable Initialization ===
 Open = open
