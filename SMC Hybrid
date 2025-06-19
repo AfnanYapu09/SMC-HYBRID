@@ -17,6 +17,10 @@ minorChoChLineShow     = 'On'
 minorChoChLineStyle    = line.style_dashed
 minorChoChLineColor    = minorLineColor
 showDollarLabel       = input.bool(true, "liquidity", group="BOS/ChoCh")
+potentialGroup        = "Potential Levels"
+showPotential         = input.bool(true, "Show Potential BOS/ChoCh", group=potentialGroup)
+potentialStyle        = input.line_style(line.style_dotted, "Line Style", group=potentialGroup)
+potentialColor        = input.color(color.gray, "Line Color", group=potentialGroup)
 // === Variable Initialization ===
 Open = open
 High = high
@@ -74,6 +78,10 @@ var chochMinorIndex = array.new_int()
 var int lockBreakm = 0 
 var string externalTrend = 'No Trend'
 var string internalTrend = 'No Trend'
+var line potentialMajorHighLine = na
+var line potentialMajorLowLine  = na
+var line potentialMinorHighLine = na
+var line potentialMinorLowLine  = na
 
 remove_last(arrType, arrValue, arrIndex) =>
     array.remove(arrType, arrType.size() - 1)
@@ -591,3 +599,32 @@ if array.size(bearBoxes) > 0
         if high >= box.get_top(bx)  // touched top of Supply OB
             box.delete(bx)
             array.remove(bearBoxes, i)
+
+// === POTENTIAL BOS/CHOCH LEVELS ===
+if showPotential and not na(majorHighLevel)
+    if na(potentialMajorHighLine)
+        potentialMajorHighLine := line.new(majorHighIndex, majorHighLevel, bar_index, majorHighLevel, style=potentialStyle, color=potentialColor, extend=extend.right)
+    else
+        line.set_xy1(potentialMajorHighLine, majorHighIndex, majorHighLevel)
+        line.set_xy2(potentialMajorHighLine, bar_index, majorHighLevel)
+
+if showPotential and not na(majorLowLevel)
+    if na(potentialMajorLowLine)
+        potentialMajorLowLine := line.new(majorLowIndex, majorLowLevel, bar_index, majorLowLevel, style=potentialStyle, color=potentialColor, extend=extend.right)
+    else
+        line.set_xy1(potentialMajorLowLine, majorLowIndex, majorLowLevel)
+        line.set_xy2(potentialMajorLowLine, bar_index, majorLowLevel)
+
+if showPotential and not na(minorHighLevel)
+    if na(potentialMinorHighLine)
+        potentialMinorHighLine := line.new(minorHighIndex, minorHighLevel, bar_index, minorHighLevel, style=potentialStyle, color=potentialColor, extend=extend.right)
+    else
+        line.set_xy1(potentialMinorHighLine, minorHighIndex, minorHighLevel)
+        line.set_xy2(potentialMinorHighLine, bar_index, minorHighLevel)
+
+if showPotential and not na(minorLowLevel)
+    if na(potentialMinorLowLine)
+        potentialMinorLowLine := line.new(minorLowIndex, minorLowLevel, bar_index, minorLowLevel, style=potentialStyle, color=potentialColor, extend=extend.right)
+    else
+        line.set_xy1(potentialMinorLowLine, minorLowIndex, minorLowLevel)
+        line.set_xy2(potentialMinorLowLine, bar_index, minorLowLevel)
