@@ -85,9 +85,9 @@ push_pivot(arrType, arrValue, arrIndex, valType, val, idx) =>
     array.push(arrValue, val)
     array.push(arrIndex, idx)
 
-f_drawLineLabel(idx, lvl, lstyle, lcolor, txt, labStyle, labSize, ext=extend.none, endLvl=lvl) =>
-    line.new(idx, lvl, bar_index, endLvl, style=lstyle, color=lcolor, extend=ext)
-    label.new((idx + bar_index) / 2, (lvl + endLvl) / 2, text=txt, color=color.rgb(0,0,0,100),
+f_drawLineLabel(idx, lvl, lstyle, lcolor, txt, labStyle, labSize, ext=extend.none) =>
+    line.new(idx, lvl, bar_index, lvl, style=lstyle, color=lcolor, extend=ext)
+    label.new((idx + bar_index) / 2, lvl, text=txt, color=color.rgb(0,0,0,100),
               textcolor=lcolor, style=labStyle, size=labSize)
 // === Pivot and Trend Logic ===
 if HighPivot  and  LowPivot
@@ -225,7 +225,7 @@ if ArrayValue.size() > 1
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
             array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
 if ArrayValueAdv.size() > 1
-    if high > majorHighLevel
+    if close > majorHighLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('ML')
@@ -277,7 +277,7 @@ if ArrayValueAdv.size() > 1
             majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-    if low < majorLowLevel
+    if close < majorLowLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('MH')
@@ -349,7 +349,7 @@ if ArrayTypeAdv.size() > 2
             minorHighType  := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
             minorLowType   := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
     if lockDetecteMMinorLvl == 1
-        if high > minorHighLevel
+        if close > minorHighLevel
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'     
                 minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -382,7 +382,7 @@ if ArrayTypeAdv.size() > 2
                 minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-        if low < minorLowLevel
+        if close < minorLowLevel
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'     
                 minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -424,7 +424,7 @@ if ArrayTypeAdv.size() > 2
         minorHighType  := na
         minorLowType   := na
         internalTrend   := 'No Trend'
-if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex
+if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex 
     if (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
         bullishMajorBoS := true
         bosMajorType.push('Bull Major $$$')
@@ -432,7 +432,7 @@ if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex
         lockBreakM := majorHighIndex
         externalTrend := 'Up Trend'
         if majorBoSLineShow == 'On'
-            f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal, extend.none, high)
+            f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal)
     else if externalTrend == 'Down Trend' 
         bullishMajorChoCh := true
         chochMajorType.push('Bull Major ChoCh')
@@ -440,11 +440,11 @@ if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex
         lockBreakM := majorHighIndex
         externalTrend := 'Up Trend'
         if majorChoChLineShow == 'On'
-            f_drawLineLabel(majorHighIndex, majorHighLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_down, size.normal, extend.none, high)
+            f_drawLineLabel(majorHighIndex, majorHighLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_down, size.normal)
 else
     bullishMajorChoCh := false
     bullishMajorBoS   := false 
-if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex
+if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex 
     if externalTrend == 'No Trend' or externalTrend == 'Down Trend'
         bearishMajorBoS := true
         bosMajorType.push('Bear Major $$$')
@@ -452,7 +452,7 @@ if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex
         lockBreakM := majorLowIndex
         externalTrend := 'Down Trend'
         if majorBoSLineShow == 'On'
-            f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal, extend.none, low)
+            f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal)
     else if externalTrend == 'Up Trend' 
         bearishMajorChoCh := true
         chochMajorType.push('Bear Major ChoCh')
@@ -460,11 +460,11 @@ if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex
         lockBreakM := majorLowIndex
         externalTrend := 'Down Trend'
         if majorChoChLineShow == 'On'
-            f_drawLineLabel(majorLowIndex, majorLowLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_up, size.normal, extend.none, low)
+            f_drawLineLabel(majorLowIndex, majorLowLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_up, size.normal)
 else 
     bearishMajorChoCh := false 
     bearishMajorBoS   := false 
-if  minorHighLevel < high  and  lockBreakm != minorHighIndex
+if  minorHighLevel < close  and  lockBreakm != minorHighIndex 
     if (internalTrend == 'No Trend' or internalTrend == 'Up Trend') 
         bullishMinorBoS   := true
         bosMinorType.push('Bull Minor $$$')
@@ -472,7 +472,7 @@ if  minorHighLevel < high  and  lockBreakm != minorHighIndex
         lockBreakm := minorHighIndex
         internalTrend := 'Up Trend'
         if minorBoSLineShow  == 'On' and showDollarLabel
-            f_drawLineLabel(minorHighIndex, minorHighLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_down, size.small, extend.none, high)
+            f_drawLineLabel(minorHighIndex, minorHighLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_down, size.small, extend.none)
     else if internalTrend == 'Down Trend' 
         bullishMinorChoCh := true
         chochMinorType.push('Bull Minor ChoCh')
@@ -480,11 +480,11 @@ if  minorHighLevel < high  and  lockBreakm != minorHighIndex
         lockBreakm := minorHighIndex
         internalTrend := 'Up Trend'
         if minorChoChLineShow  == 'On' and showDollarLabel
-            f_drawLineLabel(minorHighIndex, minorHighLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_down, size.small, extend.none, high)
+            f_drawLineLabel(minorHighIndex, minorHighLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_down, size.small, extend.none)
 else 
     bullishMinorChoCh := false
     bullishMinorBoS   := false
-if  minorLowLevel > low and  lockBreakm!= minorLowIndex
+if  minorLowLevel > close and  lockBreakm!= minorLowIndex 
     if internalTrend == 'No Trend' or internalTrend == 'Down Trend'
         bearishMinorBoS   := true
         bosMinorType.push('Bear Minor $$$')
@@ -492,7 +492,7 @@ if  minorLowLevel > low and  lockBreakm!= minorLowIndex
         lockBreakm := minorLowIndex
         internalTrend := 'Down Trend'
         if minorBoSLineShow  == 'On' and showDollarLabel
-            f_drawLineLabel(minorLowIndex, minorLowLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_up, size.small, extend.none, low)
+            f_drawLineLabel(minorLowIndex, minorLowLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_up, size.small, extend.none)
     else if internalTrend == 'Up Trend' 
         bearishMinorChoCh := true
         chochMinorType.push('Bear Minor ChoCh')
@@ -500,7 +500,7 @@ if  minorLowLevel > low and  lockBreakm!= minorLowIndex
         lockBreakm := minorLowIndex
         internalTrend := 'Down Trend'
         if minorChoChLineShow  == 'On' and showDollarLabel
-            f_drawLineLabel(minorLowIndex, minorLowLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_up, size.small, extend.none, low)
+            f_drawLineLabel(minorLowIndex, minorLowLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_up, size.small, extend.none)
 else
     bearishMinorChoCh := false
     bearishMinorBoS   := false
