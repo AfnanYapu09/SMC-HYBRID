@@ -232,7 +232,7 @@ if ArrayValue.size() > 1
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
             array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
 if ArrayValueAdv.size() > 1
-if ta.crossover(close , majorHighLevel)
+    if ta.crossover(close , majorHighLevel)
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('ML')
