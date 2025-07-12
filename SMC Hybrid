@@ -225,7 +225,7 @@ if ArrayValue.size() > 1
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
             array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
 if ArrayValueAdv.size() > 1
-    if close > majorHighLevel
+    if high > majorHighLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('ML')
@@ -277,7 +277,7 @@ if ArrayValueAdv.size() > 1
             majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
             majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
             majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-    if close < majorLowLevel
+    if low < majorLowLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('MH')
@@ -349,7 +349,7 @@ if ArrayTypeAdv.size() > 2
             minorHighType  := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
             minorLowType   := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
     if lockDetecteMMinorLvl == 1
-        if close > minorHighLevel
+        if high > minorHighLevel
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'     
                 minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -382,7 +382,7 @@ if ArrayTypeAdv.size() > 2
                 minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-        if close < minorLowLevel
+        if low < minorLowLevel
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'     
                 minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -424,7 +424,7 @@ if ArrayTypeAdv.size() > 2
         minorHighType  := na
         minorLowType   := na
         internalTrend   := 'No Trend'
-if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex 
+if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex
     if (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
         bullishMajorBoS := true
         bosMajorType.push('Bull Major $$$')
@@ -444,7 +444,7 @@ if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex
 else
     bullishMajorChoCh := false
     bullishMajorBoS   := false 
-if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex 
+if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex
     if externalTrend == 'No Trend' or externalTrend == 'Down Trend'
         bearishMajorBoS := true
         bosMajorType.push('Bear Major $$$')
@@ -464,7 +464,7 @@ if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex
 else 
     bearishMajorChoCh := false 
     bearishMajorBoS   := false 
-if  minorHighLevel < close  and  lockBreakm != minorHighIndex 
+if  minorHighLevel < high  and  lockBreakm != minorHighIndex
     if (internalTrend == 'No Trend' or internalTrend == 'Up Trend') 
         bullishMinorBoS   := true
         bosMinorType.push('Bull Minor $$$')
@@ -484,7 +484,7 @@ if  minorHighLevel < close  and  lockBreakm != minorHighIndex
 else 
     bullishMinorChoCh := false
     bullishMinorBoS   := false
-if  minorLowLevel > close and  lockBreakm!= minorLowIndex 
+if  minorLowLevel > low and  lockBreakm!= minorLowIndex
     if internalTrend == 'No Trend' or internalTrend == 'Down Trend'
         bearishMinorBoS   := true
         bosMinorType.push('Bear Minor $$$')
