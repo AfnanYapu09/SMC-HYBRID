@@ -448,6 +448,11 @@ if  ta.crossover(close, majorHighLevel) and  lockBreakM != majorHighIndex and (e
     bullBosLowIndex   := bar_index
     if majorBoSLineShow == 'On'
         f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal)
+// Track the lowest bar after a bullish BOS to place ChoCh on that candle
+if externalTrend == 'Up Trend'
+    if na(bullBosLowLevel) or low < bullBosLowLevel
+        bullBosLowLevel := low
+        bullBosLowIndex := bar_index
 if not na(bearBosHighLevel) and ta.crossover(close, bearBosHighLevel) and lockBreakM != bearBosHighIndex and externalTrend == 'Down Trend'
     bullishMajorChoCh := true
     chochMajorType.push('Bull Major ChoCh')
@@ -472,6 +477,11 @@ if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex and (ext
     bearBosHighIndex := bar_index
     if majorBoSLineShow == 'On'
         f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal)
+// Track the highest bar after a bearish BOS to place ChoCh on that candle
+if externalTrend == 'Down Trend'
+    if na(bearBosHighLevel) or high > bearBosHighLevel
+        bearBosHighLevel := high
+        bearBosHighIndex := bar_index
 if not na(bullBosLowLevel) and ta.crossunder(close, bullBosLowLevel) and  lockBreakM!= bullBosLowIndex and externalTrend == 'Up Trend'
     bearishMajorChoCh := true
     chochMajorType.push('Bear Major ChoCh')
