@@ -75,6 +75,13 @@ var int lockBreakm = 0
 var string externalTrend = 'No Trend'
 var string internalTrend = 'No Trend'
 
+var float pendingMajorHighLevel = na
+var int pendingMajorHighIndex = na
+var string pendingMajorHighType = na
+var float pendingMajorLowLevel = na
+var int pendingMajorLowIndex = na
+var string pendingMajorLowType = na
+
 remove_last(arrType, arrValue, arrIndex) =>
     array.remove(arrType, arrType.size() - 1)
     array.remove(arrValue, arrValue.size() - 1)
@@ -186,18 +193,18 @@ else if LowPivot
                 correctLowPivot :=  LowValue
 if ArrayType.size() ==  2
     if ArrayType.get(0) == 'H'
-        majorHighLevel := ArrayValue.get(0)
+        pendingMajorHighLevel := ArrayValue.get(0)
         majorLowLevel  := ArrayValue.get(1)
-        majorHighIndex := ArrayIndex.get(0)
+        pendingMajorHighIndex := ArrayIndex.get(0)
         majorLowIndex  := ArrayIndex.get(1)
-        majorHighType := ArrayType.get(0)
+        pendingMajorHighType := ArrayType.get(0)
         majorLowType  := ArrayType.get(1)
     else if ArrayType.get(0) == 'L'
-        majorHighLevel := ArrayValue.get(1)
+        pendingMajorHighLevel := ArrayValue.get(1)
         majorLowLevel  := ArrayValue.get(0) 
-        majorHighIndex := ArrayIndex.get(1)
+        pendingMajorHighIndex := ArrayIndex.get(1)
         majorLowIndex  := ArrayIndex.get(0)
-        majorHighType := ArrayType.get(1)
+        pendingMajorHighType := ArrayType.get(1)
         majorLowType  := ArrayType.get(0)
 if  ArrayValue.size() == 1
     if Lock0
@@ -225,110 +232,110 @@ if ArrayValue.size() > 1
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
             array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
 if ArrayValueAdv.size() > 1
-    if close > majorHighLevel
+if ta.crossover(close , majorHighLevel)
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('ML')
-            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))      
-            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) 
+            pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) 
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M'  + ArrayType.get(ArrayType.size() - 1)) 
-            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH' or 
              ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MLH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MHH' 
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mHL'
                 ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
                 ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))      
-                majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
-                majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
-                majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+                pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
             else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mLL'
                 ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
                 ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))
-                majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
-                majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
-                majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+                pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
     if  ArrayValueAdv.get(ArrayValueAdv.size() - 1) > majorHighLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('MH')
-            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))  
-            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)     
+            pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)     
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MHH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))
-            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
-    if close < majorLowLevel
+            pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+    if ta.crossunder(close, majorLowLevel)
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('MH')
-            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' +  ArrayType.get(ArrayType.size() - 1))      
-            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))
-            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL' or 
              ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MHL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MLL'
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mLH'
                 ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
                 ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))      
-                majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
-                majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
-                majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+                pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
             else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mHH'
                 ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
                 ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))
-                majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
-                majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
-                majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+                pendingMajorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                pendingMajorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                pendingMajorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
     if ArrayValueAdv.get(ArrayValueAdv.size() - 1) < majorLowLevel
         if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('ML')
-            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1) ) 
-            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
         else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MLL'
             ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
             ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))
-            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
-            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
-            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            pendingMajorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            pendingMajorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            pendingMajorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
 if ArrayTypeAdv.size() > 2  
     lockDetecteMMinorLvl := 1
     if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'m') == 0 and
@@ -349,7 +356,7 @@ if ArrayTypeAdv.size() > 2
             minorHighType  := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
             minorLowType   := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
     if lockDetecteMMinorLvl == 1
-        if close > minorHighLevel
+        if ta.crossover(close , minorHighLevel)
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'     
                 minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -382,7 +389,7 @@ if ArrayTypeAdv.size() > 2
                 minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
                 minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
                 minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
-        if close < minorLowLevel
+        if ta.crossunder(close , minorLowLevel)
             if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'     
                 minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
                 minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
@@ -424,7 +431,7 @@ if ArrayTypeAdv.size() > 2
         minorHighType  := na
         minorLowType   := na
         internalTrend   := 'No Trend'
-if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex 
+if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex
     if (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
         bullishMajorBoS := true
         bosMajorType.push('Bull Major $$$')
@@ -433,6 +440,20 @@ if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex
         externalTrend := 'Up Trend'
         if majorBoSLineShow == 'On'
             f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal)
+        if not na(pendingMajorLowLevel)
+            majorLowLevel := pendingMajorLowLevel
+            majorLowIndex := pendingMajorLowIndex
+            majorLowType := pendingMajorLowType
+            pendingMajorLowLevel := na
+            pendingMajorLowIndex := na
+            pendingMajorLowType := na
+        if not na(pendingMajorHighLevel)
+            majorHighLevel := pendingMajorHighLevel
+            majorHighIndex := pendingMajorHighIndex
+            majorHighType := pendingMajorHighType
+            pendingMajorHighLevel := na
+            pendingMajorHighIndex := na
+            pendingMajorHighType := na
     else if externalTrend == 'Down Trend' 
         bullishMajorChoCh := true
         chochMajorType.push('Bull Major ChoCh')
@@ -453,6 +474,20 @@ if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex
         externalTrend := 'Down Trend'
         if majorBoSLineShow == 'On'
             f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal)
+        if not na(pendingMajorHighLevel)
+            majorHighLevel := pendingMajorHighLevel
+            majorHighIndex := pendingMajorHighIndex
+            majorHighType := pendingMajorHighType
+            pendingMajorHighLevel := na
+            pendingMajorHighIndex := na
+            pendingMajorHighType := na
+        if not na(pendingMajorLowLevel)
+            majorLowLevel := pendingMajorLowLevel
+            majorLowIndex := pendingMajorLowIndex
+            majorLowType := pendingMajorLowType
+            pendingMajorLowLevel := na
+            pendingMajorLowIndex := na
+            pendingMajorLowType := na
     else if externalTrend == 'Up Trend' 
         bearishMajorChoCh := true
         chochMajorType.push('Bear Major ChoCh')
@@ -464,7 +499,7 @@ if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex
 else 
     bearishMajorChoCh := false 
     bearishMajorBoS   := false 
-if  minorHighLevel < close  and  lockBreakm != minorHighIndex 
+if  ta.crossover(close , minorHighLevel) and  lockBreakm != minorHighIndex
     if (internalTrend == 'No Trend' or internalTrend == 'Up Trend') 
         bullishMinorBoS   := true
         bosMinorType.push('Bull Minor $$$')
@@ -484,7 +519,7 @@ if  minorHighLevel < close  and  lockBreakm != minorHighIndex
 else 
     bullishMinorChoCh := false
     bullishMinorBoS   := false
-if  minorLowLevel > close and  lockBreakm!= minorLowIndex 
+if  ta.crossunder(close , minorLowLevel) and  lockBreakm!= minorLowIndex
     if internalTrend == 'No Trend' or internalTrend == 'Down Trend'
         bearishMinorBoS   := true
         bosMinorType.push('Bear Minor $$$')
