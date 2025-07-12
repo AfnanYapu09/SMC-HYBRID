@@ -220,13 +220,11 @@ if  ArrayValue.size() == 2
         Lock1 := false
 if ArrayValue.size() > 1
     if ArrayValue.get(ArrayValue.size()-1)[1] != ArrayValue.get(ArrayValue.size()-1)
-        if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) != 
-             str.substring(ArrayType.get(ArrayType.size()-1), str.length(ArrayType.get(ArrayType.size()-1))-1)
+        if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) !=  str.substring(ArrayType.get(ArrayType.size()-1), str.length(ArrayType.get(ArrayType.size()-1))-1)
             array.push(ArrayTypeAdv ,'m' +  ArrayType.get(ArrayType.size()   - 1))
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
             array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
-        else if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) == 
-             str.substring(ArrayType.get(ArrayType.size()-1), str.length(ArrayType.get(ArrayType.size()-1))-1)
+        else if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) == str.substring(ArrayType.get(ArrayType.size()-1), str.length(ArrayType.get(ArrayType.size()-1))-1)
             array.remove(ArrayValueAdv, ArrayValueAdv.size() - 1)
             array.remove(ArrayIndexAdv, ArrayIndexAdv.size() - 1)
             array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
