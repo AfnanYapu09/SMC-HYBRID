@@ -424,7 +424,9 @@ if ArrayTypeAdv.size() > 2
         minorHighType  := na
         minorLowType   := na
         internalTrend   := 'No Trend'
-if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex 
+// Use the highest point of the bar to validate bullish BOS/ChoCH
+// instead of relying on the closing price only
+if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex
     if (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
         bullishMajorBoS := true
         bosMajorType.push('Bull Major $$$')
@@ -444,7 +446,8 @@ if  ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex
 else
     bullishMajorChoCh := false
     bullishMajorBoS   := false 
-if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex 
+// Use the lowest point of the bar for bearish BOS/ChoCH validation
+if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex
     if externalTrend == 'No Trend' or externalTrend == 'Down Trend'
         bearishMajorBoS := true
         bosMajorType.push('Bear Major $$$')
@@ -464,7 +467,8 @@ if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex
 else 
     bearishMajorChoCh := false 
     bearishMajorBoS   := false 
-if  minorHighLevel < close  and  lockBreakm != minorHighIndex 
+// Minor structure break checked using bar's high
+if  minorHighLevel < high  and  lockBreakm != minorHighIndex
     if (internalTrend == 'No Trend' or internalTrend == 'Up Trend') 
         bullishMinorBoS   := true
         bosMinorType.push('Bull Minor $$$')
@@ -484,7 +488,8 @@ if  minorHighLevel < close  and  lockBreakm != minorHighIndex
 else 
     bullishMinorChoCh := false
     bullishMinorBoS   := false
-if  minorLowLevel > close and  lockBreakm!= minorLowIndex 
+// Minor bearish structure break checked using bar's low
+if  minorLowLevel > low and  lockBreakm!= minorLowIndex
     if internalTrend == 'No Trend' or internalTrend == 'Down Trend'
         bearishMinorBoS   := true
         bosMinorType.push('Bear Minor $$$')
