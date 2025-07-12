@@ -66,6 +66,10 @@ var float majorBosHighLevel = na
 var float majorBosLowLevel = na
 var int majorBosHighIndex = na
 var int majorBosLowIndex = na
+var float bullBosLowLevel = na
+var int   bullBosLowIndex = na
+var float bearBosHighLevel = na
+var int   bearBosHighIndex = na
 var int lockBreakM = 0
 var bool bullishMinorChoCh = false
 var bool bullishMinorBoS = false
@@ -429,10 +433,10 @@ if ArrayTypeAdv.size() > 2
         minorLowType   := na
         internalTrend   := 'No Trend'
 // Use the highest point of the bar to validate bullish BOS/ChoCH
-// instead of relying on the closing price only
+// Validate BOS using candle close only
 bullishMajorBoS   := false
 bullishMajorChoCh := false
-if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex and (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
+if  ta.crossover(close, majorHighLevel) and  lockBreakM != majorHighIndex and (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
     bullishMajorBoS := true
     bosMajorType.push('Bull Major $$$')
     bosMajorIndex.push(bar_index)
@@ -440,20 +444,23 @@ if  ta.crossover(high , majorHighLevel) and  lockBreakM != majorHighIndex and (e
     externalTrend := 'Up Trend'
     majorBosHighLevel := high
     majorBosHighIndex := bar_index
+    bullBosLowLevel   := low
+    bullBosLowIndex   := bar_index
     if majorBoSLineShow == 'On'
         f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal)
-if not na(majorBosHighLevel) and ta.crossover(high , majorBosHighLevel) and  lockBreakM != majorBosHighIndex and externalTrend == 'Down Trend'
+if not na(bearBosHighLevel) and ta.crossover(close, bearBosHighLevel) and lockBreakM != bearBosHighIndex and externalTrend == 'Down Trend'
     bullishMajorChoCh := true
     chochMajorType.push('Bull Major ChoCh')
     chochMajorIndex.push(bar_index)
-    lockBreakM := majorBosHighIndex
+    lockBreakM := bearBosHighIndex
     externalTrend := 'Up Trend'
     if majorChoChLineShow == 'On'
-        f_drawLineLabel(majorBosHighIndex, majorBosHighLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_down, size.normal)
+        f_drawLineLabel(bearBosHighIndex, bearBosHighLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_down, size.normal)
 // Use the lowest point of the bar for bearish BOS/ChoCH validation
 bearishMajorBoS   := false
 bearishMajorChoCh := false
-if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex and (externalTrend == 'No Trend' or externalTrend == 'Down Trend')
+// Validate BOS using candle close only
+if  ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex and (externalTrend == 'No Trend' or externalTrend == 'Down Trend')
     bearishMajorBoS := true
     bosMajorType.push('Bear Major $$$')
     bosMajorIndex.push(bar_index)
@@ -461,18 +468,20 @@ if  ta.crossunder(low, majorLowLevel) and  lockBreakM!= majorLowIndex and (exter
     externalTrend := 'Down Trend'
     majorBosLowLevel := low
     majorBosLowIndex := bar_index
+    bearBosHighLevel := high
+    bearBosHighIndex := bar_index
     if majorBoSLineShow == 'On'
         f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal)
-if not na(majorBosLowLevel) and ta.crossunder(low, majorBosLowLevel) and  lockBreakM!= majorBosLowIndex and externalTrend == 'Up Trend'
+if not na(bullBosLowLevel) and ta.crossunder(close, bullBosLowLevel) and  lockBreakM!= bullBosLowIndex and externalTrend == 'Up Trend'
     bearishMajorChoCh := true
     chochMajorType.push('Bear Major ChoCh')
     chochMajorIndex.push(bar_index)
-    lockBreakM := majorBosLowIndex
+    lockBreakM := bullBosLowIndex
     externalTrend := 'Down Trend'
     if majorChoChLineShow == 'On'
-        f_drawLineLabel(majorBosLowIndex, majorBosLowLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_up, size.normal)
+        f_drawLineLabel(bullBosLowIndex, bullBosLowLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_up, size.normal)
 // Minor structure break checked using bar's high
-if  minorHighLevel < high  and  lockBreakm != minorHighIndex
+if  minorHighLevel < close  and  lockBreakm != minorHighIndex
     if (internalTrend == 'No Trend' or internalTrend == 'Up Trend') 
         bullishMinorBoS   := true
         bosMinorType.push('Bull Minor $$$')
@@ -493,7 +502,7 @@ else
     bullishMinorChoCh := false
     bullishMinorBoS   := false
 // Minor bearish structure break checked using bar's low
-if  minorLowLevel > low and  lockBreakm!= minorLowIndex
+if  minorLowLevel > close and  lockBreakm!= minorLowIndex
     if internalTrend == 'No Trend' or internalTrend == 'Down Trend'
         bearishMinorBoS   := true
         bosMinorType.push('Bear Minor $$$')
