@@ -104,6 +104,12 @@ bosLabelOffset   = input.int(100, "Label Offset (ticks)", group=bosGroup, minval
 bosLabelTextCol  = input.color(#000000, "Label Text Color", group=bosGroup)
 bosLabelBgBull   = input.color(color.new(color.lime, 80), "Bullish Label BG", group=bosGroup)
 bosLabelBgBear   = input.color(color.new(color.red, 80), "Bearish Label BG", group=bosGroup)
+showPivotAfterBOS = input.bool(true, "Show Pivot After BOS", group=bosGroup)
+maxPivotLines     = input.int(50, "Max Pivot Lines", group=bosGroup, minval=1, maxval=300)
+
+var bool waitForNewHigh = false
+var bool waitForNewLow  = false
+var line[] pivotLines = array.new_line()
 
 // Keep latest referenced H/L (two points) and wait for break by close
 var float refHigh    = na
@@ -124,11 +130,25 @@ if not haveRefHigh and not na(ph)
     refHigh    := ph
     refHighBar := bar_index - rb
     haveRefHigh := true
+    if waitForNewHigh and showPivotAfterBOS
+        lPivotUp = line.new(refHighBar, refHigh, refHighBar + 1, refHigh, xloc=xloc.bar_index, extend=extend.right, color=bosBullColor, width=bosLineWidth)
+        array.push(pivotLines, lPivotUp)
+        if array.size(pivotLines) > maxPivotLines
+            oldPivotUp = array.shift(pivotLines)
+            line.delete(oldPivotUp)
+        waitForNewHigh := false
 
 if not haveRefLow and not na(pl)
     refLow    := pl
     refLowBar := bar_index - rb
     haveRefLow := true
+    if waitForNewLow and showPivotAfterBOS
+        lPivotDn = line.new(refLowBar, refLow, refLowBar + 1, refLow, xloc=xloc.bar_index, extend=extend.right, color=bosBearColor, width=bosLineWidth)
+        array.push(pivotLines, lPivotDn)
+        if array.size(pivotLines) > maxPivotLines
+            oldPivotDn = array.shift(pivotLines)
+            line.delete(oldPivotDn)
+        waitForNewLow := false
 
 // Require both reference points first, then detect breakouts by candle close (body)
 if showBOS and haveRefHigh and haveRefLow
@@ -151,6 +171,7 @@ if showBOS and haveRefHigh and haveRefLow
                 label.delete(oldLb)
         // Unlock High to wait for the next Pivot High to re-lock
         haveRefHigh := false
+        waitForNewHigh := true
 
     // Down-side break: close below reference Low
     if close < refLow
@@ -171,6 +192,7 @@ if showBOS and haveRefHigh and haveRefLow
                 label.delete(oldLb2)
         // Unlock Low to wait for the next Pivot Low to re-lock
         haveRefLow := false
+        waitForNewLow := true
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // === INPUTS ===
