@@ -133,6 +133,13 @@ var bool  haveRefLow = false
 var line[] bosLines = array.new_line()
 var label[] bosLabels = array.new_label()
 
+var line  currentPivotHighWickLine = na
+var float currentPivotHighWickPrice = na
+var bool  pivotHighWickActive = false
+var line  currentPivotLowWickLine = na
+var float currentPivotLowWickPrice = na
+var bool  pivotLowWickActive = false
+
 // Storage for pivot wick lines
 var line[] pivotWickLines = array.new_line()
 
@@ -144,8 +151,10 @@ if not haveRefHigh and not na(ph)
     haveRefHigh := true
     // Draw horizontal line at the pivot High candle's lowest wick
     if plotPivotWickHorizontal
-        line wH = line.new(refHighBar, low[rb], bar_index + pivotWickExtendBars, low[rb], xloc=xloc.bar_index, extend=extend.none, color=pivotHighWickColor, width=pivotWickLineWidth)
-        array.push(pivotWickLines, wH)
+        currentPivotHighWickPrice := low[rb]
+        currentPivotHighWickLine  := line.new(refHighBar, currentPivotHighWickPrice, bar_index + pivotWickExtendBars, currentPivotHighWickPrice, xloc=xloc.bar_index, extend=extend.none, color=pivotHighWickColor, width=pivotWickLineWidth)
+        pivotHighWickActive := true
+        array.push(pivotWickLines, currentPivotHighWickLine)
         if array.size(pivotWickLines) > maxPivotWickLines
             line oldW = array.shift(pivotWickLines)
             line.delete(oldW)
@@ -156,11 +165,31 @@ if not haveRefLow and not na(pl)
     haveRefLow := true
     // Draw horizontal line at the pivot Low candle's highest wick
     if plotPivotWickHorizontal
-        line wL = line.new(refLowBar, high[rb], bar_index + pivotWickExtendBars, high[rb], xloc=xloc.bar_index, extend=extend.none, color=pivotLowWickColor, width=pivotWickLineWidth)
-        array.push(pivotWickLines, wL)
+        currentPivotLowWickPrice := high[rb]
+        currentPivotLowWickLine  := line.new(refLowBar, currentPivotLowWickPrice, bar_index + pivotWickExtendBars, currentPivotLowWickPrice, xloc=xloc.bar_index, extend=extend.none, color=pivotLowWickColor, width=pivotWickLineWidth)
+        pivotLowWickActive := true
+        array.push(pivotWickLines, currentPivotLowWickLine)
         if array.size(pivotWickLines) > maxPivotWickLines
             line oldW2 = array.shift(pivotWickLines)
             line.delete(oldW2)
+
+if plotPivotWickHorizontal
+    if pivotHighWickActive
+        if high > refHigh
+            pivotHighWickActive := false
+        else
+            line.set_xy2(currentPivotHighWickLine, bar_index + pivotWickExtendBars, currentPivotHighWickPrice)
+            if low <= currentPivotHighWickPrice
+                line.set_xy1(currentPivotHighWickLine, bar_index, currentPivotHighWickPrice)
+                line.set_xy2(currentPivotHighWickLine, bar_index + pivotWickExtendBars, currentPivotHighWickPrice)
+    if pivotLowWickActive
+        if low < refLow
+            pivotLowWickActive := false
+        else
+            line.set_xy2(currentPivotLowWickLine, bar_index + pivotWickExtendBars, currentPivotLowWickPrice)
+            if high >= currentPivotLowWickPrice
+                line.set_xy1(currentPivotLowWickLine, bar_index, currentPivotLowWickPrice)
+                line.set_xy2(currentPivotLowWickLine, bar_index + pivotWickExtendBars, currentPivotLowWickPrice)
 
 // Require both reference points first, then detect breakouts by candle close (body)
 if showBOS and haveRefHigh and haveRefLow
