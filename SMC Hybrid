@@ -471,6 +471,7 @@ if barstate.isconfirmed and ta.crossover(close , majorHighLevel) and  lockBreakM
         externalTrend := 'Up Trend'
         if majorBoSLineShow == 'On'
             f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal)
+            drawFib(majorHighIndex, majorHighLevel, close, majorBoSLineColor)
     else if externalTrend == 'Down Trend' 
         bullishMajorChoCh := true
         chochMajorType.push('Bull Major ChoCh')
@@ -479,6 +480,7 @@ if barstate.isconfirmed and ta.crossover(close , majorHighLevel) and  lockBreakM
         externalTrend := 'Up Trend'
         if majorChoChLineShow == 'On'
             f_drawLineLabel(majorHighIndex, majorHighLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_down, size.normal)
+            drawFib(majorHighIndex, majorHighLevel, close, majorChoChLineColor)
 else
     bullishMajorChoCh := false
     bullishMajorBoS   := false 
@@ -491,6 +493,7 @@ if barstate.isconfirmed and ta.crossunder(close, majorLowLevel) and  lockBreakM!
         externalTrend := 'Down Trend'
         if majorBoSLineShow == 'On'
             f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal)
+            drawFib(majorLowIndex, majorLowLevel, close, majorBoSLineColor)
     else if externalTrend == 'Up Trend' 
         bearishMajorChoCh := true
         chochMajorType.push('Bear Major ChoCh')
@@ -499,6 +502,7 @@ if barstate.isconfirmed and ta.crossunder(close, majorLowLevel) and  lockBreakM!
         externalTrend := 'Down Trend'
         if majorChoChLineShow == 'On'
             f_drawLineLabel(majorLowIndex, majorLowLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_up, size.normal)
+            drawFib(majorLowIndex, majorLowLevel, close, majorChoChLineColor)
 else 
     bearishMajorChoCh := false 
     bearishMajorBoS   := false 
@@ -511,6 +515,7 @@ if barstate.isconfirmed and minorHighLevel < close and lockBreakm != minorHighIn
         internalTrend := 'Up Trend'
         if minorBoSLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorHighIndex, minorHighLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_down, size.small, extend.none)
+            drawFib(minorHighIndex, minorHighLevel, close, minorBoSLineColor)
     else if internalTrend == 'Down Trend' 
         bullishMinorChoCh := true
         chochMinorType.push('Bull Minor ChoCh')
@@ -519,6 +524,7 @@ if barstate.isconfirmed and minorHighLevel < close and lockBreakm != minorHighIn
         internalTrend := 'Up Trend'
         if minorChoChLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorHighIndex, minorHighLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_down, size.small, extend.none)
+            drawFib(minorHighIndex, minorHighLevel, close, minorChoChLineColor)
 else 
     bullishMinorChoCh := false
     bullishMinorBoS   := false
@@ -531,6 +537,7 @@ if barstate.isconfirmed and minorLowLevel > close and lockBreakm != minorLowInde
         internalTrend := 'Down Trend'
         if minorBoSLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorLowIndex, minorLowLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_up, size.small, extend.none)
+            drawFib(minorLowIndex, minorLowLevel, close, minorBoSLineColor)
     else if internalTrend == 'Up Trend' 
         bearishMinorChoCh := true
         chochMinorType.push('Bear Minor ChoCh')
@@ -539,7 +546,18 @@ if barstate.isconfirmed and minorLowLevel > close and lockBreakm != minorLowInde
         internalTrend := 'Down Trend'
         if minorChoChLineShow  == 'On' and showDollarLabel
             f_drawLineLabel(minorLowIndex, minorLowLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_up, size.small, extend.none)
+            drawFib(minorLowIndex, minorLowLevel, close, minorChoChLineColor)
 else
     bearishMinorChoCh := false
     bearishMinorBoS   := false
+
+drawFib(idx, pivot, brk, lcolor) =>
+    if not na(idx) and not na(pivot) and not na(brk)
+        mid = (pivot + brk) / 2
+        line.new(idx, pivot, bar_index, pivot, extend=extend.right, color=lcolor)
+        line.new(idx, mid, bar_index, mid, extend=extend.right, color=lcolor)
+        line.new(idx, brk, bar_index, brk, extend=extend.right, color=lcolor)
+        label.new(bar_index, pivot, '100', style=label.style_label_left, textcolor=lcolor, size=size.tiny)
+        label.new(bar_index, mid, '50', style=label.style_label_left, textcolor=lcolor, size=size.tiny)
+        label.new(bar_index, brk, '0', style=label.style_label_left, textcolor=lcolor, size=size.tiny)
 
