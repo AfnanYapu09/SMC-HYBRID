@@ -1,321 +1,545 @@
-
 //@version=5
-// สคริปต์แสดงจุดสูงสุดและต่ำสุด (HH & LL) พร้อมโครงสร้างตลาด
-indicator('จุดสูงต่ำ HH & LL', overlay=true, max_lines_count=500)
+// === Indicator Setup ===
+indicator("SMC Hybrid V.1.2" ,'SMC V.1.2', overlay = true, max_bars_back = 5000, max_boxes_count = 500,max_labels_count = 500, max_lines_count = 500 )
+// === Default Parameters (configuration removed) ===
+PP = 5
+majorBoSLineShow       = 'On'
+majorBoSLineStyle      = line.style_solid
+majorBoSLineColor      = input.color(color.black, "Bos", group="BOS/ChoCh")
+majorChoChLineShow     = 'On'
+majorChoChLineStyle    = line.style_solid
+majorChoChLineColor    = input.color(#ff0000, "ChoCh", group="BOS/ChoCh")
+minorBoSLineShow       = 'On'
+minorBoSLineStyle      = line.style_dashed
+minorLineColor         = input.color(#363a45ce, "liquidity", group="BOS/ChoCh")
+minorBoSLineColor      = minorLineColor
+minorChoChLineShow     = 'On'
+minorChoChLineStyle    = line.style_dashed
+minorChoChLineColor    = minorLineColor
+showDollarLabel       = input.bool(true, "liquidity", group="BOS/ChoCh")
+// === Variable Initialization ===
+Open = open
+High = high
+Low = low
+Close = close 
+barIndex = bar_index
+ATR =ta.atr(55)
+var ArrayType = array.new_string()
+var ArrayValue = array.new_float()
+var ArrayIndex =  array.new_int()
+var ArrayTypeAdv  = array.new_string()
+var ArrayValueAdv = array.new_float()
+var ArrayIndexAdv =  array.new_int()  
+PASS = 0
+HighPivot = ta.pivothigh(PP,PP)
+LowPivot = ta.pivotlow(PP,PP)
+HighValue = ta.valuewhen(HighPivot ,High[PP], 0)
+LowValue = ta.valuewhen(LowPivot ,Low[PP], 0)
+HighIndex = ta.valuewhen(HighPivot ,barIndex[PP], 0)
+LowIndex = ta.valuewhen(LowPivot ,barIndex[PP], 0)
+correctHighPivot = 0.0
+correctLowPivot =  0.0
+var float majorHighLevel = na
+var float majorLowLevel  = na
+var int majorHighIndex = na
+var int majorLowIndex = na
+var string majorHighType= na
+var string majorLowType = na
+var float minorHighLevel = na
+var float minorLowLevel  = na
+var int minorHighIndex   = na
+var int minorLowIndex    = na
+var string minorHighType = na
+var string minorLowType  = na
+var int lockDetecteMMinorLvl = 0
+var bool Lock0 = true
+var bool Lock1 = true
+var bool bullishMajorChoCh = false
+var bool bullishMajorBoS = false
+var bool bearishMajorChoCh = false
+var bool bearishMajorBoS = false
+var bosMajorType  = array.new_string()
+var bosMajorIndex = array.new_int()
+var chochMajorType  = array.new_string()
+var chochMajorIndex = array.new_int()
+var int lockBreakM = 0 
+var bool bullishMinorChoCh = false
+var bool bullishMinorBoS = false
+var bool bearishMinorChoCh = false
+var bool bearishMinorBoS = false
+var bosMinorType  = array.new_string()
+var bosMinorIndex = array.new_int()
+var chochMinorType  = array.new_string()
+var chochMinorIndex = array.new_int()
+var int lockBreakm = 0 
+var string externalTrend = 'No Trend'
+var string internalTrend = 'No Trend'
 
-// === การตั้งค่าพารามิเตอร์ ===
-lb = input.int(5, title='จำนวนแท่งซ้าย', minval=1)
-rb = input.int(5, title='จำนวนแท่งขวา', minval=1)
+remove_last(arrType, arrValue, arrIndex) =>
+    array.remove(arrType, arrType.size() - 1)
+    array.remove(arrValue, arrValue.size() - 1)
+    array.remove(arrIndex, arrIndex.size() - 1)
 
-ph = ta.pivothigh(lb, rb)
-pl = ta.pivotlow(lb, rb)
-// ทิศทางแนวโน้ม: 1 = ขาขึ้น, -1 = ขาลง
-iff_1 = pl ? -1 : na
-hl = ph ? 1 : iff_1
-// คล้าย ZigZag แต่สามารถมีหลายจุดสูง/ต่ำ
-iff_2 = pl ? pl : na
-zz = ph ? ph : iff_2
-valuewhen_1 = ta.valuewhen(hl, hl, 1)
-valuewhen_2 = ta.valuewhen(zz, zz, 1)
-zz := pl and hl == -1 and valuewhen_1 == -1 and pl > valuewhen_2 ? na : zz
-valuewhen_3 = ta.valuewhen(hl, hl, 1)
-valuewhen_4 = ta.valuewhen(zz, zz, 1)
-zz := ph and hl == 1 and valuewhen_3 == 1 and ph < valuewhen_4 ? na : zz
+push_pivot(arrType, arrValue, arrIndex, valType, val, idx) =>
+    array.push(arrType, valType)
+    array.push(arrValue, val)
+    array.push(arrIndex, idx)
 
-valuewhen_5 = ta.valuewhen(hl, hl, 1)
-valuewhen_6 = ta.valuewhen(zz, zz, 1)
-hl := hl == -1 and valuewhen_5 == 1 and zz > valuewhen_6 ? na : hl
-valuewhen_7 = ta.valuewhen(hl, hl, 1)
-valuewhen_8 = ta.valuewhen(zz, zz, 1)
-hl := hl == 1 and valuewhen_7 == -1 and zz < valuewhen_8 ? na : hl
-zz := na(hl) ? na : zz
-
-// === ฟังก์ชันค้นหาค่าก่อนหน้า ===
-findprevious() =>  // finds previous three points (b, c, d, e)
-    ehl = hl == 1 ? -1 : 1
-    loc1 = 0.0
-    loc2 = 0.0
-    loc3 = 0.0
-    loc4 = 0.0
-    xx = 0
-    for x = 1 to 1000 by 1
-        if hl[x] == ehl and not na(zz[x])
-            loc1 := zz[x]
-            xx := x + 1
-            break
-    ehl := hl
-    for x = xx to 1000 by 1
-        if hl[x] == ehl and not na(zz[x])
-            loc2 := zz[x]
-            xx := x + 1
-            break
-    ehl := hl == 1 ? -1 : 1
-    for x = xx to 1000 by 1
-        if hl[x] == ehl and not na(zz[x])
-            loc3 := zz[x]
-            xx := x + 1
-            break
-    ehl := hl
-    for x = xx to 1000 by 1
-        if hl[x] == ehl and not na(zz[x])
-            loc4 := zz[x]
-            break
-    [loc1, loc2, loc3, loc4]
-
-float a = na
-float b = na
-float c = na
-float d = na
-float e = na
-if not na(hl)
-    [loc1, loc2, loc3, loc4] = findprevious()
-    a := zz
-    b := loc1
-    c := loc2
-    d := loc3
-    e := loc4
-    e
-
-_hh = zz and a > b and a > c and c > b and c > d   // จุดสูงใหม่ (HH)
-_ll = zz and a < b and a < c and c < b and c < d   // จุดต่ำใหม่ (LL)
-_hl = zz and (a >= c and b > c and b > d and d > c and d > e or a < b and a > c and b < d) // จุดต่ำยกสูง (HL)
-_lh = zz and (a <= c and b < c and b < d and d < c and d < e or a > b and a < c and b > d) // จุดสูงย่อต่ำ (LH)
-
-plotshape(_hl, text='HL', title='จุดต่ำยกสูง (Higher Low)', style=shape.circle, color=color.new(color.red, 0), textcolor=color.new(color.black, 0), location=location.belowbar, offset=-rb)
-plotshape(_hh, text='HH', title='จุดสูงยกสูง (Higher High)', style=shape.circle, color=color.new(color.red, 0), textcolor=color.new(color.black, 0), location=location.abovebar, offset=-rb)
-plotshape(_ll, text='LL', title='จุดต่ำยกต่ำ (Lower Low)', style=shape.circle, color=color.new(color.red, 0), textcolor=color.new(color.black, 0), location=location.belowbar, offset=-rb)
-plotshape(_lh, text='LH', title='จุดสูงย่อต่ำ (Lower High)', style=shape.circle, color=color.new(color.red, 0), textcolor=color.new(color.black, 0), location=location.abovebar, offset=-rb)
-
-float res = na
-float sup = na
-res := _lh ? zz : res[1]
-sup := _hl ? zz : sup[1]
-
-int trend = na
-iff_3 = close < sup ? -1 : nz(trend[1])
-trend := close > res ? 1 : iff_3
-
-
-
-
-// === โครงสร้าง BOS (Break of Structure) จาก Pivot(5) ===
-bosGroup         = "โครงสร้าง BOS"
-showBOS          = input.bool(true, "แสดงเส้น BOS", group=bosGroup)
-maxBOSLines      = input.int(50, "จำนวนเส้น BOS สูงสุด", group=bosGroup, minval=1, maxval=300)
-bosBullColor     = input.color(color.new(color.lime, 0), "สีเมื่อทะลุขึ้น", group=bosGroup)
-bosBearColor     = input.color(color.new(color.red, 0), "สีเมื่อทะลุลง", group=bosGroup)
-bosLineWidth     = input.int(2, "ความหนาเส้น", group=bosGroup, minval=1, maxval=4)
-showBOSLabel     = input.bool(true, "แสดงป้าย BOS", group=bosGroup)
-bosLabelOffset   = input.int(100, "ระยะห่างป้าย (ticks)", group=bosGroup, minval=0, maxval=100)
-bosLabelTextCol  = input.color(#000000, "สีตัวอักษรป้าย", group=bosGroup)
-bosLabelBgBull   = input.color(color.new(color.lime, 80), "พื้นหลังป้ายขาขึ้น", group=bosGroup)
-bosLabelBgBear   = input.color(color.new(color.red, 80), "พื้นหลังป้ายขาลง", group=bosGroup)
-
-// === เส้นไส้เทียน Pivot ===
-pivotWickGroup          = "เส้นไส้เทียน Pivot"
-plotPivotWickHorizontal = input.bool(true, "วาดเส้นที่ไส้เทียนของ Pivot", group=pivotWickGroup)
-pivotHighWickColor      = input.color(color.new(color.red, 0), "สีเส้นไส้เทียนสูงสุด", group=pivotWickGroup)
-pivotLowWickColor       = input.color(color.new(color.lime, 0), "สีเส้นไส้เทียนต่ำสุด", group=pivotWickGroup)
-pivotWickLineWidth      = input.int(2, "ความหนาเส้น", group=pivotWickGroup, minval=1, maxval=4)
-pivotWickExtendBars     = input.int(5, "ยืดเส้นไปทางขวา", group=pivotWickGroup, minval=0, maxval=200)
-maxPivotWickLines       = input.int(100, "จำนวนเส้นสูงสุด", group=pivotWickGroup, minval=1, maxval=300)
-
-// Keep latest referenced H/L (two points) and wait for break by close
-var float refHigh    = na
-var int   refHighBar = na
-var bool  haveRefHigh = false
-
-var float refLow     = na
-var int   refLowBar  = na
-var bool  haveRefLow = false
-
-// Store created BOS lines to cap amount
-var line[] bosLines = array.new_line()
-var label[] bosLabels = array.new_label()
-
-var line  currentPivotHighWickLine = na
-var float currentPivotHighWickPrice = na
-var bool  pivotHighWickActive = false
-var line  currentPivotLowWickLine = na
-var float currentPivotLowWickPrice = na
-var bool  pivotLowWickActive = false
-
-// Storage for pivot wick lines
-var line[] pivotWickLines = array.new_line()
-
-// Capture initial/reference Pivot High/Low once, then freeze until that side is broken
-// Note: ta.pivothigh/low return the pivot price confirmed rb bars ago → index is (bar_index - rb)
-if not haveRefHigh and not na(ph)
-    refHigh    := ph
-    refHighBar := bar_index - rb
-    haveRefHigh := true
-    // Draw horizontal line at the pivot High candle's lowest wick
-    if plotPivotWickHorizontal
-        currentPivotHighWickPrice := low[rb]
-        currentPivotHighWickLine  := line.new(refHighBar, currentPivotHighWickPrice, bar_index + pivotWickExtendBars, currentPivotHighWickPrice, xloc=xloc.bar_index, extend=extend.none, color=pivotHighWickColor, width=pivotWickLineWidth)
-        pivotHighWickActive := true
-        array.push(pivotWickLines, currentPivotHighWickLine)
-        if array.size(pivotWickLines) > maxPivotWickLines
-            line oldW = array.shift(pivotWickLines)
-            line.delete(oldW)
-
-if not haveRefLow and not na(pl)
-    refLow    := pl
-    refLowBar := bar_index - rb
-    haveRefLow := true
-    // Draw horizontal line at the pivot Low candle's highest wick
-    if plotPivotWickHorizontal
-        currentPivotLowWickPrice := high[rb]
-        currentPivotLowWickLine  := line.new(refLowBar, currentPivotLowWickPrice, bar_index + pivotWickExtendBars, currentPivotLowWickPrice, xloc=xloc.bar_index, extend=extend.none, color=pivotLowWickColor, width=pivotWickLineWidth)
-        pivotLowWickActive := true
-        array.push(pivotWickLines, currentPivotLowWickLine)
-        if array.size(pivotWickLines) > maxPivotWickLines
-            line oldW2 = array.shift(pivotWickLines)
-            line.delete(oldW2)
-
-if plotPivotWickHorizontal
-    if pivotHighWickActive
-        if high > refHigh
-            pivotHighWickActive := false
+f_drawLineLabel(idx, lvl, lstyle, lcolor, txt, labStyle, labSize, ext=extend.none) =>
+    // ตรวจสอบความปลอดภัยของ index
+    if not na(idx) and not na(lvl) and idx >= 0 and idx <= bar_index
+        xRight = bar_index - (barstate.islast ? 1 : 0)
+        // สำหรับเส้น Minor ($$$) ให้วาดไปถึงแท่งเทียนที่ทะลุ แต่ไม่เลยเนื้อเทียน
+        if txt == '$$$'
+            // หาแท่งเทียนที่ทะลุเส้น - ใช้วิธีที่แม่นยำและป้องกันการทะลุเนื้อเทียน
+            breakBar = idx
+            if labStyle == label.style_label_down  // เส้น Minor High
+                for i = 0 to math.min(1000, bar_index - idx)  // ตรวจสอบไม่เกิน 1000 แท่ง
+                    if high[i] > lvl
+                        breakBar := bar_index - i - 1  // หยุดที่แท่งก่อนหน้าที่ทะลุ
+                        break
+            else if labStyle == label.style_label_up  // เส้น Minor Low
+                for i = 0 to math.min(1000, bar_index - idx)  // ตรวจสอบไม่เกิน 1000 แท่ง
+                    if low[i] < lvl
+                        breakBar := bar_index - i - 1  // หยุดที่แท่งก่อนหน้าที่ทะลุ
+                        break
+            
+            // เพิ่มการตรวจจับและป้องกันการทะลุเนื้อเทียน
+            if breakBar > idx
+                // ตรวจสอบแท่งเทียนที่อาจทะลุเส้น
+                for i = idx to breakBar
+                    if i <= bar_index
+                        if labStyle == label.style_label_down  // เส้น Minor High
+                            // ตรวจสอบว่าแท่งเทียนนั้นมีเนื้อเทียนที่ทะลุเส้นหรือไม่
+                            if high[bar_index - i] > lvl
+                                breakBar := i - 1  // หยุดที่แท่งก่อนหน้าที่ทะลุ
+                                break
+                        else if labStyle == label.style_label_up  // เส้น Minor Low
+                            // ตรวจสอบว่าแท่งเทียนนั้นมีเนื้อเทียนที่ทะลุเส้นหรือไม่
+                            if low[bar_index - i] < lvl
+                                breakBar := i - 1  // หยุดที่แท่งก่อนหน้าที่ทะลุ
+                                break
+            
+            // วาดเส้นไปถึงแท่งเทียนที่ทะลุ (ไม่เลยเนื้อเทียน)
+            xRight := math.min(xRight, breakBar)
+            line.new(idx, lvl, xRight, lvl, style=lstyle, color=lcolor, extend=extend.none)
         else
-            line.set_xy2(currentPivotHighWickLine, bar_index + pivotWickExtendBars, currentPivotHighWickPrice)
-            if low <= currentPivotHighWickPrice
-                line.set_xy1(currentPivotHighWickLine, bar_index, currentPivotHighWickPrice)
-                line.set_xy2(currentPivotHighWickLine, bar_index + pivotWickExtendBars, currentPivotHighWickPrice)
-    if pivotLowWickActive
-        if low < refLow
-            pivotLowWickActive := false
-        else
-            line.set_xy2(currentPivotLowWickLine, bar_index + pivotWickExtendBars, currentPivotLowWickPrice)
-            if high >= currentPivotLowWickPrice
-                line.set_xy1(currentPivotLowWickLine, bar_index, currentPivotLowWickPrice)
-                line.set_xy2(currentPivotLowWickLine, bar_index + pivotWickExtendBars, currentPivotLowWickPrice)
+            line.new(idx, lvl, xRight, lvl, style=lstyle, color=lcolor, extend=ext)
+        label.new(int(math.floor((idx + xRight) / 2)), lvl, text=txt, color=color.rgb(0,0,0,100),
+                  textcolor=lcolor, style=labStyle, size=labSize)
+// === Pivot and Trend Logic ===
+if HighPivot  and  LowPivot
+    if ArrayType.size() == 0
+        PASS := 1
+    else if ArrayType.size() >= 1
+        if ((ArrayType.get(ArrayType.size() - 1)) == "L" or
+             (ArrayType.get(ArrayType.size() - 1)) == "LL")
+            if LowPivot < ArrayValue.get(ArrayType.size() - 1)
+                remove_last(ArrayType, ArrayValue, ArrayIndex)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                correctLowPivot :=  LowValue
+            else 
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+            correctHighPivot := HighValue  
+        else if (ArrayType.get(ArrayType.size() - 1)) == "H" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "HH"
+            if HighPivot > ArrayValue.get(ArrayType.size() - 1)
+                remove_last(ArrayType, ArrayValue, ArrayIndex)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                correctHighPivot := HighValue  
+            else 
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+            correctLowPivot :=  LowValue    
+        else if (ArrayType.get(ArrayType.size() - 1)) == "LH"
+            if HighPivot < ArrayValue.get(ArrayType.size() - 1)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                correctLowPivot :=  LowValue 
+            else if HighPivot > ArrayValue.get(ArrayType.size() - 1)
+                if close < ArrayValue.get(ArrayType.size() - 1)
+                    remove_last(ArrayType, ArrayValue, ArrayIndex)
+                    push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                    correctHighPivot := HighValue  
+                else if close > ArrayValue.get(ArrayType.size() - 1)
+                    push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                    correctLowPivot :=  LowValue
+        else if (ArrayType.get(ArrayType.size() - 1)) == "HL"
+            if LowPivot > ArrayValue.get(ArrayType.size() - 1)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                correctHighPivot := HighValue                       
+            else if LowPivot < ArrayValue.get(ArrayType.size() - 1)
+                if close > ArrayValue.get(ArrayType.size() - 1)
+                    remove_last(ArrayType, ArrayValue, ArrayIndex)
+                    push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                    correctLowPivot :=  LowValue
+                else if close < ArrayValue.get(ArrayType.size() - 1)
+                    push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                    correctHighPivot := HighValue                         
+else if  HighPivot 
+    if ArrayType.size() == 0
+        array.insert(ArrayType, 0, "H")
+        array.insert(ArrayValue, 0, HighValue)
+        array.insert(ArrayIndex, 0, HighIndex)
+        correctHighPivot := HighValue
+    else if ArrayType.size() >= 1
+        if ((ArrayType.get(ArrayType.size() - 1)) == "L" or
+             (ArrayType.get(ArrayType.size() - 1)) == "HL" or
+             (ArrayType.get(ArrayType.size() - 1)) == "LL")
+            if HighPivot > ArrayValue.get(ArrayType.size() - 1)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                correctHighPivot := HighValue
+            else if  HighPivot < ArrayValue.get(ArrayType.size() - 1)
+                remove_last(ArrayType, ArrayValue, ArrayIndex)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                correctLowPivot :=  LowValue                         
+        else if (ArrayType.get(ArrayType.size() - 1)) == "H" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "HH" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "LH"
+            if (ArrayValue.get(ArrayValue.size() - 1)) < HighValue
+                remove_last(ArrayType, ArrayValue, ArrayIndex)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                correctHighPivot := HighValue               
+else if LowPivot 
+    if ArrayType.size() == 0
+        array.insert(ArrayType, 0, "L")
+        array.insert(ArrayValue, 0, LowValue)
+        array.insert(ArrayIndex, 0, LowIndex)
+        correctLowPivot :=  LowValue
+    else if ArrayType.size() >= 1
+        if (ArrayType.get(ArrayType.size() - 1)) == "H" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "HH" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "LH"
+            if LowPivot < ArrayValue.get(ArrayType.size() - 1)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                correctLowPivot :=  LowValue
+            else if LowPivot > ArrayValue.get(ArrayType.size() - 1)
+                remove_last(ArrayType, ArrayValue, ArrayIndex)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < HighValue ? "HH" : "LH" : "H", HighValue, HighIndex)
+                correctHighPivot := HighValue                        
+        else if (ArrayType.get(ArrayType.size() - 1)) == "L" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "HL" or 
+             (ArrayType.get(ArrayType.size() - 1)) == "LL"
+            if (ArrayValue.get(ArrayValue.size() - 1)) > LowValue
+                remove_last(ArrayType, ArrayValue, ArrayIndex)
+                push_pivot(ArrayType, ArrayValue, ArrayIndex, ArrayType.size()>2? ArrayValue.get(ArrayType.size() - 2) < LowValue ? "HL" : "LL" : "L", LowValue, LowIndex)
+                correctLowPivot :=  LowValue
+if ArrayType.size() ==  2
+    if ArrayType.get(0) == 'H'
+        majorHighLevel := ArrayValue.get(0)
+        majorLowLevel  := ArrayValue.get(1)
+        majorHighIndex := ArrayIndex.get(0)
+        majorLowIndex  := ArrayIndex.get(1)
+        majorHighType := ArrayType.get(0)
+        majorLowType  := ArrayType.get(1)
+    else if ArrayType.get(0) == 'L'
+        majorHighLevel := ArrayValue.get(1)
+        majorLowLevel  := ArrayValue.get(0) 
+        majorHighIndex := ArrayIndex.get(1)
+        majorLowIndex  := ArrayIndex.get(0)
+        majorHighType := ArrayType.get(1)
+        majorLowType  := ArrayType.get(0)
+if  ArrayValue.size() == 1
+    if Lock0
+        array.insert(ArrayTypeAdv ,0 ,'M' +  ArrayType.get(0))
+        array.insert(ArrayValueAdv,0 ,ArrayValue.get(0))
+        array.insert(ArrayIndexAdv,0 ,ArrayIndex.get(0))   
+        Lock0 := false
+if  ArrayValue.size() == 2
+    if Lock1
+        array.insert(ArrayTypeAdv ,1 ,'M' +  ArrayType.get(1))
+        array.insert(ArrayValueAdv,1 ,ArrayValue.get(1))
+        array.insert(ArrayIndexAdv,1 ,ArrayIndex.get(1))   
+        Lock1 := false
+if ArrayValue.size() > 1
+    if ArrayValue.get(ArrayValue.size()-1)[1] != ArrayValue.get(ArrayValue.size()-1)
+        if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) != 
+             str.substring(ArrayType.get(ArrayType.size()-1), str.length(ArrayType.get(ArrayType.size()-1))-1)
+            array.push(ArrayTypeAdv ,'m' +  ArrayType.get(ArrayType.size()   - 1))
+            array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
+            array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
+        else if str.substring(ArrayType.get(ArrayType.size()-1)[1], str.length(ArrayType.get(ArrayType.size()-1))-1) == 
+             str.substring(ArrayType.get(ArrayType.size()-1), str.length(ArrayType.get(ArrayType.size()-1))-1)
+            array.remove(ArrayValueAdv, ArrayValueAdv.size() - 1)
+            array.remove(ArrayIndexAdv, ArrayIndexAdv.size() - 1)
+            array.push(ArrayValueAdv, ArrayValue.get(ArrayValue.size() - 1))
+            array.push(ArrayIndexAdv, ArrayIndex.get(ArrayIndex.size() - 1))
+if ArrayValueAdv.size() > 1
+    if close > majorHighLevel
+        if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('ML')
+            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))      
+            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) 
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M'  + ArrayType.get(ArrayType.size() - 1)) 
+            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH' or 
+             ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MLH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MHH' 
+            if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mHL'
+                ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
+                ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))      
+                majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mLL'
+                ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
+                ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))
+                majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+    if  ArrayValueAdv.get(ArrayValueAdv.size() - 1) > majorHighLevel
+        if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('MH')
+            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))  
+            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)     
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MHH'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))
+            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+    if close < majorLowLevel
+        if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mH'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('MH')
+            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' +  ArrayType.get(ArrayType.size() - 1))      
+            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))
+            majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL' or 
+             ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MHL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MLL'
+            if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mLH'
+                ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
+                ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))      
+                majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mHH'
+                ArrayTypeAdv.remove(ArrayTypeAdv.size() - 2)
+                ArrayTypeAdv.insert(ArrayValueAdv.size() - 2 , 'M' + ArrayType.get(ArrayType.size() - 2))
+                majorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                majorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                majorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+    if ArrayValueAdv.get(ArrayValueAdv.size() - 1) < majorLowLevel
+        if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mL'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('ML')
+            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1) ) 
+            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+        else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'MLL'
+            ArrayTypeAdv.remove(ArrayTypeAdv.size() - 1)
+            ArrayTypeAdv.push('M' + ArrayType.get(ArrayType.size() - 1))
+            majorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+            majorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+            majorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+if ArrayTypeAdv.size() > 2  
+    lockDetecteMMinorLvl := 1
+    if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'m') == 0 and
+     str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 2),'m') == 0   and
+     str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 3),'M') == 0
+        if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'H') == 2
+            minorHighLevel := ArrayValueAdv.get(ArrayTypeAdv.size() - 1)
+            minorLowLevel  := ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
+            minorHighIndex := ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
+            minorLowIndex  := ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
+            minorHighType  := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            minorLowType   := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+        else if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'L') == 2
+            minorHighLevel := ArrayValueAdv.get(ArrayTypeAdv.size() - 2)
+            minorLowLevel  := ArrayValueAdv.get(ArrayTypeAdv.size() - 1) 
+            minorHighIndex := ArrayIndexAdv.get(ArrayTypeAdv.size() - 2)
+            minorLowIndex  := ArrayIndexAdv.get(ArrayTypeAdv.size() - 1)
+            minorHighType  := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+            minorLowType   := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+    if lockDetecteMMinorLvl == 1
+        if close > minorHighLevel
+            if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL'     
+                minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) 
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL'
+                minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH'
+                if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mHL'     
+                    minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                    minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                    minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+                else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mLL'
+                    minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                    minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                    minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+        if  ArrayValueAdv.get(ArrayValueAdv.size() - 1) > minorHighLevel
+            if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH' 
+                minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) 
+                minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)                    
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH'
+                minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+                minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+        if close < minorLowLevel
+            if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLH'     
+                minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHH'
+                minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL' or ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL'
+                if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mLH'     
+                    minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                    minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                    minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+                else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 2) == 'mHH'
+                    minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                    minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                    minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+        if ArrayValueAdv.get(ArrayValueAdv.size() - 1) < minorLowLevel
+            if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mHL' 
+                minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+                minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+            else if ArrayTypeAdv.get(ArrayTypeAdv.size() - 1) == 'mLL' 
+                minorLowLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 1)
+                minorLowIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 1)
+                minorLowType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 1)
+                minorHighLevel := ArrayValueAdv.get(ArrayValueAdv.size() - 2)
+                minorHighIndex := ArrayIndexAdv.get(ArrayIndexAdv.size() - 2)
+                minorHighType := ArrayTypeAdv.get(ArrayTypeAdv.size() - 2)
+    if str.pos(ArrayTypeAdv.get(ArrayTypeAdv.size() - 1),'M') == 0
+        lockDetecteMMinorLvl := 0
+        minorHighLevel := na
+        minorLowLevel  := na
+        minorHighIndex := na
+        minorLowIndex  := na
+        minorHighType  := na
+        minorLowType   := na
+        internalTrend   := 'No Trend'
+if barstate.isconfirmed and ta.crossover(close , majorHighLevel) and  lockBreakM != majorHighIndex 
+    if (externalTrend == 'No Trend' or externalTrend == 'Up Trend')
+        bullishMajorBoS := true
+        bosMajorType.push('Bull Major $$$')
+        bosMajorIndex.push(bar_index)
+        lockBreakM := majorHighIndex
+        externalTrend := 'Up Trend'
+        if majorBoSLineShow == 'On'
+            f_drawLineLabel(majorHighIndex, majorHighLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_down, size.normal)
+    else if externalTrend == 'Down Trend' 
+        bullishMajorChoCh := true
+        chochMajorType.push('Bull Major ChoCh')
+        chochMajorIndex.push(bar_index)
+        lockBreakM := majorHighIndex
+        externalTrend := 'Up Trend'
+        if majorChoChLineShow == 'On'
+            f_drawLineLabel(majorHighIndex, majorHighLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_down, size.normal)
+else
+    bullishMajorChoCh := false
+    bullishMajorBoS   := false 
+if barstate.isconfirmed and ta.crossunder(close, majorLowLevel) and  lockBreakM!= majorLowIndex 
+    if externalTrend == 'No Trend' or externalTrend == 'Down Trend'
+        bearishMajorBoS := true
+        bosMajorType.push('Bear Major $$$')
+        bosMajorIndex.push(bar_index)
+        lockBreakM := majorLowIndex
+        externalTrend := 'Down Trend'
+        if majorBoSLineShow == 'On'
+            f_drawLineLabel(majorLowIndex, majorLowLevel, majorBoSLineStyle, majorBoSLineColor, 'Bos', label.style_label_up, size.normal)
+    else if externalTrend == 'Up Trend' 
+        bearishMajorChoCh := true
+        chochMajorType.push('Bear Major ChoCh')
+        chochMajorIndex.push(bar_index)
+        lockBreakM := majorLowIndex
+        externalTrend := 'Down Trend'
+        if majorChoChLineShow == 'On'
+            f_drawLineLabel(majorLowIndex, majorLowLevel, majorChoChLineStyle, majorChoChLineColor, 'choch', label.style_label_up, size.normal)
+else 
+    bearishMajorChoCh := false 
+    bearishMajorBoS   := false 
+if barstate.isconfirmed and minorHighLevel < close and lockBreakm != minorHighIndex and not na(minorHighLevel) and not na(minorHighIndex)
+    if (internalTrend == 'No Trend' or internalTrend == 'Up Trend') 
+        bullishMinorBoS   := true
+        bosMinorType.push('Bull Minor $$$')
+        bosMinorIndex.push(bar_index)
+        lockBreakm := minorHighIndex
+        internalTrend := 'Up Trend'
+        if minorBoSLineShow  == 'On' and showDollarLabel
+            f_drawLineLabel(minorHighIndex, minorHighLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_down, size.small, extend.none)
+    else if internalTrend == 'Down Trend' 
+        bullishMinorChoCh := true
+        chochMinorType.push('Bull Minor ChoCh')
+        chochMinorIndex.push(bar_index)
+        lockBreakm := minorHighIndex
+        internalTrend := 'Up Trend'
+        if minorChoChLineShow  == 'On' and showDollarLabel
+            f_drawLineLabel(minorHighIndex, minorHighLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_down, size.small, extend.none)
+else 
+    bullishMinorChoCh := false
+    bullishMinorBoS   := false
+if barstate.isconfirmed and minorLowLevel > close and lockBreakm != minorLowIndex and not na(minorLowLevel) and not na(minorLowIndex)
+    if internalTrend == 'No Trend' or internalTrend == 'Down Trend'
+        bearishMinorBoS   := true
+        bosMinorType.push('Bear Minor $$$')
+        bosMinorIndex.push(bar_index)
+        lockBreakm := minorLowIndex
+        internalTrend := 'Down Trend'
+        if minorBoSLineShow  == 'On' and showDollarLabel
+            f_drawLineLabel(minorLowIndex, minorLowLevel, minorBoSLineStyle, minorBoSLineColor, '$$$', label.style_label_up, size.small, extend.none)
+    else if internalTrend == 'Up Trend' 
+        bearishMinorChoCh := true
+        chochMinorType.push('Bear Minor ChoCh')
+        chochMinorIndex.push(bar_index)
+        lockBreakm := minorLowIndex
+        internalTrend := 'Down Trend'
+        if minorChoChLineShow  == 'On' and showDollarLabel
+            f_drawLineLabel(minorLowIndex, minorLowLevel, minorChoChLineStyle, minorChoChLineColor, '$$$', label.style_label_up, size.small, extend.none)
+else
+    bearishMinorChoCh := false
+    bearishMinorBoS   := false
 
-// Require both reference points first, then detect breakouts by candle close (body)
-if showBOS and haveRefHigh and haveRefLow
-    // Up-side break: close above reference High
-    if close > refHigh
-        lUp = line.new(refHighBar, refHigh, bar_index, refHigh, xloc=xloc.bar_index, extend=extend.none, color=bosBullColor, width=bosLineWidth)
-        array.push(bosLines, lUp)
-        // Create BOS label at midpoint (above line)
-        label lbUp = na
-        if showBOSLabel
-            midBarUp = int(math.round((refHighBar + bar_index) / 2.0))
-            yUp = refHigh + bosLabelOffset * syminfo.mintick
-            lbUp := label.new(midBarUp, yUp, text="BOS", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_center, textcolor=bosLabelTextCol, color=color.new(bosLabelBgBull, 100), textalign=text.align_center)
-        array.push(bosLabels, lbUp)
-        if array.size(bosLines) > maxBOSLines
-            oldLine = array.shift(bosLines)
-            line.delete(oldLine)
-            oldLb = array.shift(bosLabels)
-            if not na(oldLb)
-                label.delete(oldLb)
-        // Unlock High to wait for the next Pivot High to re-lock
-        haveRefHigh := false
-
-    // Down-side break: close below reference Low
-    if close < refLow
-        lDn = line.new(refLowBar, refLow, bar_index, refLow, xloc=xloc.bar_index, extend=extend.none, color=bosBearColor, width=bosLineWidth)
-        array.push(bosLines, lDn)
-        // Create BOS label at midpoint (below line)
-        label lbDn = na
-        if showBOSLabel
-            midBarDn = int(math.round((refLowBar + bar_index) / 2.0))
-            yDn = refLow - bosLabelOffset * syminfo.mintick
-            lbDn := label.new(midBarDn, yDn, text="BOS", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_center, textcolor=bosLabelTextCol, color=color.new(bosLabelBgBear, 100), textalign=text.align_center)
-        array.push(bosLabels, lbDn)
-        if array.size(bosLines) > maxBOSLines
-            oldLine2 = array.shift(bosLines)
-            line.delete(oldLine2)
-            oldLb2 = array.shift(bosLabels)
-            if not na(oldLb2)
-                label.delete(oldLb2)
-        // Unlock Low to wait for the next Pivot Low to re-lock
-        haveRefLow := false
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// === ออเดอร์บล็อก (Order Blocks) ===
-obGroup      = "ออเดอร์บล็อก"
-var bool showOrderblock = true
-maxBoxes     = input.int(6, "จำนวนบล็อกสูงสุด", group=obGroup)
-colorBull    = input.color(color.rgb(0, 64, 255, 80), "สีบล็อกขาขึ้น", group=obGroup)
-colorBear    = input.color(color.rgb(255, 82, 82, 80), "สีบล็อกขาลง", group=obGroup)
-
-
-// === อาร์เรย์สำหรับจัดเก็บบล็อก ===
-var box[] bullBoxes = array.new_box()
-var box[] bearBoxes = array.new_box()
-
-// === ตรวจจับและวาดออเดอร์บล็อก ===
-if showOrderblock
-    // ── บล็อกขาขึ้น (Demand) ──
-    if low > high[2]
-        box ob = na
-        if low[1] > high[3]
-            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = color.new(colorBull, 100))
-            box.set_text(ob, "Dz")
-            box.set_text_halign(ob, text.align_right)
-            box.set_text_size(ob, size.small)
-        else if low[2] <= low[1]
-            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[2], bgcolor = colorBull, border_color = color.new(colorBull, 100))
-            box.set_text(ob, "Dz")
-            box.set_text_halign(ob, text.align_right)
-            box.set_text_size(ob, size.small)
-        else
-            ob := box.new(left = bar_index[2], top = high[2], right = bar_index, bottom = low[1], bgcolor = colorBull, border_color = color.new(colorBull, 100))
-            box.set_text(ob, "Dz")
-            box.set_text_halign(ob, text.align_right)
-            box.set_text_size(ob, size.small)
-        array.push(bullBoxes, ob)
-        if array.size(bullBoxes) > maxBoxes
-            oldbx = array.shift(bullBoxes)
-            box.delete(oldbx)
-
-    // ── บล็อกขาลง (Supply) ──
-    if high < low[2]
-        box ob = na
-        if high[1] < low[3]
-            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = color.new(colorBear, 100))
-            box.set_text(ob, "Sz")
-            box.set_text_halign(ob, text.align_right)
-            box.set_text_size(ob, size.small)
-        else if high[2] <= high[1]
-            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[1], bgcolor = colorBear, border_color = color.new(colorBear, 100))
-            box.set_text(ob, "Sz")
-            box.set_text_halign(ob, text.align_right)
-            box.set_text_size(ob, size.small)
-        else
-            ob := box.new(left = bar_index[2], top = low[2], right = bar_index, bottom = high[2], bgcolor = colorBear, border_color = color.new(colorBear, 100))
-            box.set_text(ob, "Sz")
-            box.set_text_halign(ob, text.align_right)
-            box.set_text_size(ob, size.small)
-        array.push(bearBoxes, ob)
-        if array.size(bearBoxes) > maxBoxes
-            oldbx = array.shift(bearBoxes)
-            box.delete(oldbx)
-
-// === ขยายบล็อกถึงแท่งปัจจุบัน ===
-if array.size(bullBoxes) > 0
-    for i = 0 to array.size(bullBoxes) - 1
-        bx = array.get(bullBoxes, i)
-        box.set_right(bx, bar_index)
-
-if array.size(bearBoxes) > 0
-    for i = 0 to array.size(bearBoxes) - 1
-        bx = array.get(bearBoxes, i)
-        box.set_right(bx, bar_index)
-
-// === ลบบล็อกเมื่อราคาชนเส้น BOS ===
-if array.size(bullBoxes) > 0
-    for i = array.size(bullBoxes) - 1 to 0
-        bx = array.get(bullBoxes, i)
-        if low <= box.get_top(bx)
-            box.delete(bx)
-            array.remove(bullBoxes, i)
-
-if array.size(bearBoxes) > 0
-    for i = array.size(bearBoxes) - 1 to 0
-        bx = array.get(bearBoxes, i)
-        if high >= box.get_top(bx)  // touched top of Supply OB
-            box.delete(bx)
-            array.remove(bearBoxes, i)
